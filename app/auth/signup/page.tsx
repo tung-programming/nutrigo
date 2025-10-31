@@ -47,7 +47,36 @@ export default function SignUpPage() {
 
   useEffect(() => {
     setIsMounted(true)
-  }, [])
+
+    // ✅ Handles the redirect logic after a user returns from Google OAuth
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // This logic only runs when a user is signed in via the OAuth redirect
+      if (event === 'SIGNED_IN' && session) {
+        // Unsubscribe to prevent this from running on subsequent auth events in the app
+        authListener.subscription.unsubscribe();
+
+        const userCreationTime = new Date(session.user.created_at).getTime();
+        const now = new Date().getTime();
+        // Check if the user account was created in the last 60 seconds.
+        const isNewUser = (now - userCreationTime) < 60000;
+
+        if (isNewUser) {
+          // If it's a new user, redirect them to the dashboard.
+          router.push('/dashboard');
+        } else {
+          // If it's an existing user, show an error and sign them out to force a login.
+          setError("User already registered. Please log in.");
+          await supabase.auth.signOut();
+          setIsLoading(false);
+        }
+      }
+    });
+
+    // Cleanup the listener when the component unmounts
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [router]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -78,50 +107,70 @@ export default function SignUpPage() {
     setError("")
   }
 
-  const handleSubmit = async (e) => {
-  e.preventDefault()
-  setIsLoading(true)
-  setError("")
+  // ✅ Handles manual sign-up (email/password)
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
 
-  if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-    setError("All fields are required")
+    // Basic form validation
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError("All fields are required")
+      setIsLoading(false)
+      return
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match")
+      setIsLoading(false)
+      return
+    }
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters")
+      setIsLoading(false)
+      return
+    }
+
+    // Attempt to sign up the user
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: { full_name: formData.name },
+      },
+    })
+
+    // ✅ Supabase automatically checks for existing users. If the email is already in use,
+    // it will return an error, which we display to the user.
+    if (signUpError) {
+      setError(signUpError.message) // e.g., "User already registered"
+      setIsLoading(false)
+      return
+    }
+
+    // On successful manual registration, prompt for verification and redirect to login
+    alert("Signup successful! Please check your email to verify your account.")
     setIsLoading(false)
-    return
+    router.push("/auth/login")
   }
 
-  if (formData.password !== formData.confirmPassword) {
-    setError("Passwords do not match")
-    setIsLoading(false)
-    return
+  // ✅ Handles the start of the Google Sign-Up flow
+  const handleGoogleSignUp = async () => {
+    setIsLoading(true)
+    setError("")
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        // Redirect back to this same page. The `useEffect` hook will then handle the logic.
+        redirectTo: window.location.href,
+      },
+    })
+
+    if (error) {
+      setError(error.message)
+      setIsLoading(false)
+    }
+    // On success, the user is redirected to Google, and then back to the `redirectTo` URL.
   }
-
-  if (formData.password.length < 8) {
-    setError("Password must be at least 8 characters")
-    setIsLoading(false)
-    return
-  }
-
-  // ✅ Create user in Supabase
-  const { data, error: signUpError } = await supabase.auth.signUp({
-    email: formData.email,
-    password: formData.password,
-    options: {
-      data: { full_name: formData.name },
-    },
-  })
-
-  if (signUpError) {
-    setError(signUpError.message)
-    setIsLoading(false)
-    return
-  }
-
-  // ✅ Success
-  alert("Signup successful! You can now log in.")
-  setIsLoading(false)
-  router.push("/auth/login")
-}
-
 
   const calculateEyePosition = (centerX: number, centerY: number) => {
     if (isPasswordFocused || isConfirmPasswordFocused) return { x: 0, y: 0 }
@@ -188,7 +237,7 @@ export default function SignUpPage() {
       `}</style>
 
       <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-0 items-center relative z-10">
-        {/* Left Side - Animated Characters (SAME AS BEFORE) */}
+        {/* Left Side - Animated Characters */}
         <div className="hidden lg:flex items-center justify-center bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl rounded-l-3xl border-l border-t border-b border-emerald-500/20 p-12 relative overflow-visible h-[700px]">
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-0 left-0 w-full h-full" style={{
@@ -367,7 +416,7 @@ export default function SignUpPage() {
           </div>
         </div>
 
-        {/* Right Side - Form (SAME AS BEFORE) */}
+        {/* Right Side - Form */}
         <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl rounded-r-3xl lg:rounded-l-none rounded-3xl border border-emerald-500/20 p-8 shadow-2xl h-[700px] flex flex-col justify-center">
           <div className="space-y-4 max-w-md mx-auto w-full">
             <div className="text-center space-y-1 mb-4">
@@ -474,13 +523,14 @@ export default function SignUpPage() {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Creating...
+                    <span>Processing...</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    Create Account <ArrowRight size={16} />
+                  <div className="flex items-center justify-center gap-2">
+                    <span>Create Account</span>
+                    <ArrowRight size={16} />
                   </div>
                 )}
               </Button>
@@ -497,7 +547,8 @@ export default function SignUpPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-10 border border-slate-700 hover:border-slate-600 bg-slate-800/30 hover:bg-slate-800/50 text-white rounded-lg transition-all text-sm"
+                className="w-full h-10 border border-slate-700 hover:border-slate-600 bg-slate-800/30 hover:bg-slate-800/50 text-white rounded-lg transition-all text-sm flex items-center justify-center"
+                onClick={handleGoogleSignUp}
                 disabled={isLoading}
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
@@ -506,7 +557,7 @@ export default function SignUpPage() {
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                Sign up with Google
+                <span>Sign up with Google</span>
               </Button>
             </form>
 
