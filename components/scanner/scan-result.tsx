@@ -10,17 +10,20 @@ interface ScanResultProps {
     name: string
     brand: string
     healthScore: number
-    calories: number
-    sugar: number
-    protein: number
-    fat: number
-    carbs: number
+    nutrition?: {
+      calories?: number
+      sugar?: number
+      protein?: number
+      fat?: number
+      carbs?: number
+    }
     ingredients: string[]
     warnings: string[]
-    timestamp: string
+    timestamp?: string
   }
   onReset: () => void
 }
+
 
 export default function ScanResult({ data, onReset }: ScanResultProps) {
   const getScoreColor = (score: number) => {
@@ -128,19 +131,23 @@ export default function ScanResult({ data, onReset }: ScanResultProps) {
               <h3 className="text-xl font-black text-white">Nutrition Facts</h3>
             </div>
             <div className="space-y-3">
-              {[
-                { label: "Calories", value: `${data.calories} kcal`, color: "text-white" },
-                { label: "Sugar", value: `${data.sugar}g`, color: "text-red-400" },
-                { label: "Protein", value: `${data.protein}g`, color: "text-emerald-400" },
-                { label: "Fat", value: `${data.fat}g`, color: "text-white" },
-                { label: "Carbs", value: `${data.carbs}g`, color: "text-white" }
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 rounded-xl bg-slate-800/50 border border-slate-700 hover:border-teal-500/40 transition-all">
-                  <span className="text-slate-400">{item.label}</span>
-                  <span className={`font-black text-lg ${item.color}`}>{item.value}</span>
-                </div>
-              ))}
-            </div>
+            {[
+              { label: "Calories", value: `${data.nutrition?.calories ?? "N/A"} kcal`, color: "text-white" },
+              { label: "Sugar", value: `${data.nutrition?.sugar ?? "N/A"}g`, color: "text-red-400" },
+              { label: "Protein", value: `${data.nutrition?.protein ?? "N/A"}g`, color: "text-emerald-400" },
+              { label: "Fat", value: `${data.nutrition?.fat ?? "N/A"}g`, color: "text-white" },
+              { label: "Carbs", value: `${data.nutrition?.carbs ?? "N/A"}g`, color: "text-white" },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between p-4 rounded-xl bg-slate-800/50 border border-slate-700 hover:border-teal-500/40 transition-all"
+              >
+                <span className="text-slate-400">{item.label}</span>
+                <span className={`font-black text-lg ${item.color}`}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+
           </Card>
 
           {/* Warnings */}
@@ -174,14 +181,18 @@ export default function ScanResult({ data, onReset }: ScanResultProps) {
             <h3 className="text-xl font-black text-white">Ingredients</h3>
           </div>
           <div className="flex flex-wrap gap-3">
-            {data.ingredients.map((ingredient, index) => (
-              <span
-                key={index}
-                className="px-4 py-2 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-sm text-cyan-300 font-semibold hover:bg-cyan-500/30 transition-all cursor-default"
-              >
-                {ingredient}
-              </span>
-            ))}
+            {(data.ingredients ?? []).length > 0 ? (
+              data.ingredients.map((ingredient, index) => (
+                <span
+                  key={index}
+                  className="px-4 py-2 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-sm"
+                >
+                  {ingredient}
+                </span>
+              ))
+            ) : (
+              <span className="text-slate-400 italic">No ingredients info available</span>
+            )}
           </div>
         </Card>
 

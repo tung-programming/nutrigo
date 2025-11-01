@@ -1,10 +1,10 @@
 "use client"
 
-import type React from "react"
-import { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Camera, Upload, X, Loader, Sparkles, Zap, CheckCircle } from "lucide-react"
+import { Camera, Upload, X, Sparkles, Zap, CheckCircle } from "lucide-react"
 import ScanResult from "@/components/scanner/scan-result"
 
 interface ScanData {
@@ -28,27 +28,21 @@ export default function ScannerPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const router = useRouter()
 
-  const mockScanResult: ScanData = {
-    name: "Coca Cola",
-    brand: "The Coca-Cola Company",
-    healthScore: 25,
-    calories: 140,
-    sugar: 39,
-    protein: 0,
-    fat: 0,
-    carbs: 39,
-    ingredients: [
-      "Carbonated Water",
-      "High Fructose Corn Syrup",
-      "Caramel Color",
-      "Phosphoric Acid",
-      "Natural Flavors",
-    ],
-    warnings: ["High Sugar Content", "Contains Caffeine", "High Calorie Density"],
-    timestamp: new Date().toLocaleString(),
-  }
+  // ✅ Backend base URL (only one definition now)
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000/api/scan";
 
+
+  // ✅ Auto-load last scan if available
+  useEffect(() => {
+    const scanData = localStorage.getItem("lastScan")
+    if (scanData) {
+      setScanResult(JSON.parse(scanData))
+    }
+  }, [])
+
+  // 🎥 Start camera mode
   const handleCameraStart = async () => {
     setScanMode("camera")
     try {
@@ -63,41 +57,84 @@ export default function ScannerPage() {
     }
   }
 
-  const handleCapture = () => {
-    if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext("2d")
-      if (context) {
-        context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height)
-        setIsScanning(true)
+  // 📸 Capture frame and send to backend
+  const handleCapture = async () => {
+    if (!videoRef.current || !canvasRef.current) return
+    const context = canvasRef.current.getContext("2d")
+    if (!context) return
 
-        setTimeout(() => {
-          setScanResult(mockScanResult)
-          setIsScanning(false)
-          setScanMode(null)
-          if (videoRef.current?.srcObject) {
-            const tracks = (videoRef.current.srcObject as MediaStream).getTracks()
-            tracks.forEach((track) => track.stop())
-          }
-        }, 2000)
+    context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height)
+    canvasRef.current.toBlob(async (blob) => {
+      if (!blob) return
+      setIsScanning(true)
+
+      try {
+        const formData = new FormData()
+        formData.append("image", blob, "capture.jpg")
+
+        const response = await fetch(`${BACKEND_URL}/image`, {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json()
+        if (response.ok) {
+          setScanResult(data)
+          localStorage.setItem("lastScan", JSON.stringify(data))
+        } else {
+          alert(data.error || "Scan failed")
+        }
+      } catch (err) {
+        console.error("Error sending image:", err)
+        alert("Failed to process the image.")
+      } finally {
+        stopCamera()
+        setIsScanning(false)
       }
+    }, "image/jpeg")
+  }
+
+  // 📤 Upload image
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setScanMode("upload")
+    setIsScanning(true)
+
+    try {
+      const formData = new FormData()
+      formData.append("image", file)
+
+      const response = await fetch(`${BACKEND_URL}/image`, {
+        method: "POST",
+        body: formData,
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        setScanResult(data)
+        localStorage.setItem("lastScan", JSON.stringify(data))
+      } else {
+        alert(data.error || "No match found")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Upload failed")
+    } finally {
+      setIsScanning(false)
+      setScanMode(null)
     }
   }
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setScanMode("upload")
-      setIsScanning(true)
-
-      setTimeout(() => {
-        setScanResult(mockScanResult)
-        setIsScanning(false)
-        setScanMode(null)
-      }, 2000)
+  const stopCamera = () => {
+    if (videoRef.current?.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks()
+      tracks.forEach((track) => track.stop())
     }
   }
 
   const handleReset = () => {
+    stopCamera()
     setScanResult(null)
     setScanMode(null)
   }
@@ -108,7 +145,7 @@ export default function ScannerPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-      {/* Background Effects */}
+      {/* Background Glow */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <div className="absolute top-20 left-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: "2s" }}></div>
@@ -122,62 +159,40 @@ export default function ScannerPage() {
               <Zap size={28} className="text-white" />
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-black text-white">
-                Food Scanner
-              </h1>
+              <h1 className="text-4xl md:text-5xl font-black text-white">Food Scanner</h1>
               <p className="text-slate-400 text-lg">Scan any food or beverage to get instant nutrition insights</p>
             </div>
           </div>
         </div>
 
-        {/* Scanner Interface */}
+        {/* Main Options */}
         {!scanMode ? (
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Camera Option */}
             <Card className="group relative p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 shadow-xl hover:shadow-emerald-500/20 cursor-pointer overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <button
-                onClick={handleCameraStart}
-                className="relative w-full h-full flex flex-col items-center justify-center space-y-6 text-center"
-              >
+              <button onClick={handleCameraStart} className="relative w-full h-full flex flex-col items-center justify-center space-y-6 text-center">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
                   <Camera size={40} className="text-white" />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-black text-white">Use Camera</h3>
-                  <p className="text-slate-400">Point your camera at the food label</p>
-                </div>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 text-emerald-400 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Sparkles size={16} />
-                  <span>Click to start</span>
-                </div>
+                <h3 className="text-2xl font-black text-white">Use Camera</h3>
+                <p className="text-slate-400">Point your camera at the food label</p>
               </button>
             </Card>
 
             {/* Upload Option */}
             <Card className="group relative p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300 shadow-xl hover:shadow-teal-500/20 cursor-pointer overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="relative w-full h-full flex flex-col items-center justify-center space-y-6 text-center"
-              >
+              <button onClick={() => fileInputRef.current?.click()} className="relative w-full h-full flex flex-col items-center justify-center space-y-6 text-center">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-500/25 group-hover:scale-110 transition-transform duration-300">
                   <Upload size={40} className="text-white" />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-black text-white">Upload Image</h3>
-                  <p className="text-slate-400">Choose an image from your device</p>
-                </div>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 text-teal-400 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Sparkles size={16} />
-                  <span>Click to upload</span>
-                </div>
+                <h3 className="text-2xl font-black text-white">Upload Image</h3>
+                <p className="text-slate-400">Choose an image from your device</p>
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
             </Card>
           </div>
         ) : (
-          /* Camera/Upload View */
+          /* Camera Active View */
           <Card className="max-w-4xl mx-auto p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 shadow-xl space-y-6">
             {scanMode === "camera" && (
               <div className="space-y-6">
@@ -185,17 +200,12 @@ export default function ScannerPage() {
                   <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
                   <canvas ref={canvasRef} className="hidden" width={640} height={480} />
 
-                  {/* Scan Frame Overlay */}
+                  {/* Overlay Frame */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-64 h-80 border-4 border-emerald-400/50 rounded-2xl shadow-lg shadow-emerald-500/25">
-                      <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-emerald-400 rounded-tl-2xl"></div>
-                      <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-emerald-400 rounded-tr-2xl"></div>
-                      <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-emerald-400 rounded-bl-2xl"></div>
-                      <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-emerald-400 rounded-br-2xl"></div>
-                    </div>
+                    <div className="w-64 h-80 border-4 border-emerald-400/50 rounded-2xl shadow-lg shadow-emerald-500/25"></div>
                   </div>
 
-                  {/* Loading Indicator */}
+                  {/* Loader */}
                   {isScanning && (
                     <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center">
                       <div className="space-y-6 text-center">
@@ -203,10 +213,8 @@ export default function ScannerPage() {
                           <div className="w-20 h-20 rounded-full border-4 border-emerald-500/20 border-t-emerald-400 animate-spin mx-auto"></div>
                           <Sparkles className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-emerald-400 animate-pulse" />
                         </div>
-                        <div className="space-y-2">
-                          <p className="text-white text-xl font-bold">Analyzing label...</p>
-                          <p className="text-emerald-400 text-sm">AI is processing your image</p>
-                        </div>
+                        <p className="text-white text-xl font-bold">Analyzing label...</p>
+                        <p className="text-emerald-400 text-sm">AI is processing your image</p>
                       </div>
                     </div>
                   )}
@@ -222,13 +230,7 @@ export default function ScannerPage() {
                     Capture & Scan
                   </Button>
                   <Button
-                    onClick={() => {
-                      setScanMode(null)
-                      if (videoRef.current?.srcObject) {
-                        const tracks = (videoRef.current.srcObject as MediaStream).getTracks()
-                        tracks.forEach((track) => track.stop())
-                      }
-                    }}
+                    onClick={handleReset}
                     variant="outline"
                     className="h-14 px-8 border-2 border-slate-700 hover:border-red-500/50 bg-slate-800/50 hover:bg-red-500/10 text-slate-300 hover:text-red-400 transition-all"
                   >
@@ -254,7 +256,7 @@ export default function ScannerPage() {
               "Ensure the nutrition label is clearly visible and well-lit",
               "Hold the camera steady for 2-3 seconds",
               "Make sure the entire label fits within the frame",
-              "Avoid shadows and glare on the label"
+              "Avoid shadows and glare on the label",
             ].map((tip, idx) => (
               <li key={idx} className="flex items-start gap-4 group">
                 <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
