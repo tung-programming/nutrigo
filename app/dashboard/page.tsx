@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { useRouter } from "next/navigation"
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -27,48 +28,135 @@ const recentScans = [
 
 export default function DashboardPage() {
   const supabase = createClientComponentClient()
+  const router = useRouter()
   const [userName, setUserName] = useState<string>("User")
   const [userEmail, setUserEmail] = useState<string>("")
   const [isLoading, setIsLoading] = useState(true)
+  const [authError, setAuthError] = useState<string>("")
 
   useEffect(() => {
-    // ✅ Fetch user data from Supabase Auth
+    // ✅ CRITICAL FIX: Fetch user data with proper error handling
     const fetchUser = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser()
+        // ✅ First check if we have a valid session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
-        if (error) {
-          console.error('Error fetching user:', error)
+        if (sessionError) {
+          console.error('Session error:', sessionError)
+          setAuthError("Session expired. Please log in again.")
+          setIsLoading(false)
+          router.push('/auth/login')
+          return
+        }
+
+        if (!session) {
+          console.log('No session found, redirecting to login')
+          setIsLoading(false)
+          router.push('/auth/login')
+          return
+        }
+
+        // ✅ Now safely fetch user data
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+        if (userError) {
+          console.error('User fetch error:', userError)
+          
+          // ✅ CRITICAL FIX: Handle the specific "User from sub claim in JWT does not exist" error
+          if (userError.message.includes('sub claim') || 
+              userError.message.includes('does not exist') ||
+              userError.status === 401) {
+            setAuthError("Your account is not fully set up. Please verify your email or try logging in again.")
+            
+            // Sign out and redirect to login
+            await supabase.auth.signOut()
+            setTimeout(() => {
+              router.push('/auth/login')
+            }, 2000)
+            return
+          }
+          
+          setAuthError("Failed to load user data. Please try again.")
           setIsLoading(false)
           return
         }
 
         if (user) {
-          // ✅ Try to get full_name from user metadata (set during signup)
+          // ✅ CRITICAL FIX: Additional check to ensure email is confirmed
+          if (!user.email_confirmed_at) {
+            console.log('Email not confirmed')
+            setAuthError("Please verify your email address before accessing the dashboard.")
+            await supabase.auth.signOut()
+            setTimeout(() => {
+              router.push('/auth/login')
+            }, 2000)
+            return
+          }
+
+          // ✅ Set user data
           const fullName = user.user_metadata?.full_name || user.user_metadata?.display_name
           
-          // ✅ If full_name exists, use it; otherwise extract from email
           if (fullName) {
             setUserName(fullName)
           } else if (user.email) {
-            // Extract first part of email as fallback (e.g., "john" from "john@example.com")
             const emailUsername = user.email.split('@')[0]
             setUserName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1))
           }
 
-          // Store email for future use
           setUserEmail(user.email || "")
+        } else {
+          // No user data available
+          setAuthError("Unable to load user information. Please log in again.")
+          router.push('/auth/login')
         }
 
         setIsLoading(false)
-      } catch (err) {
+      } catch (err: any) {
         console.error('Unexpected error fetching user:', err)
+        setAuthError("An unexpected error occurred. Please try logging in again.")
         setIsLoading(false)
+        
+        // Redirect to login after error
+        setTimeout(() => {
+          router.push('/auth/login')
+        }, 2000)
       }
     }
 
     fetchUser()
-  }, [supabase])
+  }, [supabase, router])
+
+  // ✅ Show error state if auth fails
+  if (authError) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-8 bg-slate-900 border border-red-500/30 rounded-2xl">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-full bg-red-500/20 flex items-center justify-center">
+              <svg className="w-8 h-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-white">Authentication Error</h2>
+            <p className="text-slate-400">{authError}</p>
+            <p className="text-sm text-slate-500">Redirecting to login...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ✅ Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 mx-auto border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+          <p className="text-slate-400">Loading your dashboard...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
@@ -88,13 +176,9 @@ export default function DashboardPage() {
             </div>
             <div>
               <h1 className="text-4xl md:text-5xl font-black text-white">
-                Welcome back, {isLoading ? (
-                  <span className="inline-block w-32 h-10 bg-slate-800 animate-pulse rounded-lg"></span>
-                ) : (
-                  <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                    {userName}
-                  </span>
-                )}!
+                Welcome back, <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                  {userName}
+                </span>!
               </h1>
               <p className="text-slate-400 text-lg">Here's your nutrition journey this week</p>
             </div>
