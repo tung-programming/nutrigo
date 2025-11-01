@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect, useState } from "react"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -24,6 +26,50 @@ const recentScans = [
 ]
 
 export default function DashboardPage() {
+  const supabase = createClientComponentClient()
+  const [userName, setUserName] = useState<string>("User")
+  const [userEmail, setUserEmail] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // ✅ Fetch user data from Supabase Auth
+    const fetchUser = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser()
+
+        if (error) {
+          console.error('Error fetching user:', error)
+          setIsLoading(false)
+          return
+        }
+
+        if (user) {
+          // ✅ Try to get full_name from user metadata (set during signup)
+          const fullName = user.user_metadata?.full_name || user.user_metadata?.display_name
+          
+          // ✅ If full_name exists, use it; otherwise extract from email
+          if (fullName) {
+            setUserName(fullName)
+          } else if (user.email) {
+            // Extract first part of email as fallback (e.g., "john" from "john@example.com")
+            const emailUsername = user.email.split('@')[0]
+            setUserName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1))
+          }
+
+          // Store email for future use
+          setUserEmail(user.email || "")
+        }
+
+        setIsLoading(false)
+      } catch (err) {
+        console.error('Unexpected error fetching user:', err)
+        setIsLoading(false)
+      }
+    }
+
+    fetchUser()
+  }, [supabase])
+
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
       {/* Animated Background */}
@@ -42,7 +88,13 @@ export default function DashboardPage() {
             </div>
             <div>
               <h1 className="text-4xl md:text-5xl font-black text-white">
-                Welcome back, <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">User</span>!
+                Welcome back, {isLoading ? (
+                  <span className="inline-block w-32 h-10 bg-slate-800 animate-pulse rounded-lg"></span>
+                ) : (
+                  <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                    {userName}
+                  </span>
+                )}!
               </h1>
               <p className="text-slate-400 text-lg">Here's your nutrition journey this week</p>
             </div>

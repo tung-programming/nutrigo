@@ -1,6 +1,10 @@
 "use client"
 
 import { supabase } from "@/lib/supabaseClient"
+
+
+
+
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -21,7 +25,6 @@ export default function SignUpPage() {
     confirmPassword: "",
   })
   const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
   const [isMounted, setIsMounted] = useState(false)
   
   const [isPasswordFocused, setIsPasswordFocused] = useState(false)
@@ -45,79 +48,35 @@ export default function SignUpPage() {
   useEffect(() => {
     setIsMounted(true)
 
-    // Check if user is already logged in
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        // User is already logged in, redirect to dashboard
-        router.push('/dashboard')
-      }
-    }
-
-    checkSession()
-
-    // ✅ Enhanced OAuth redirect handling with comprehensive checks
+    // ✅ Handles the redirect logic after a user returns from Google OAuth
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth event:', event, 'Session:', session)
-
-      // Handle successful sign-in from OAuth providers
+      // This logic only runs when a user is signed in via the OAuth redirect
       if (event === 'SIGNED_IN' && session) {
-        try {
-          const user = session.user
-          const userCreationTime = new Date(user.created_at).getTime()
-          const now = new Date().getTime()
-          
-          // Check if user was created in the last 60 seconds (new user)
-          const isNewUser = (now - userCreationTime) < 60000
+        // Unsubscribe to prevent this from running on subsequent auth events in the app
+        authListener.subscription.unsubscribe();
 
-          // Get user's identities to check OAuth provider
-          const isOAuthUser = user.app_metadata.provider !== 'email'
+        const userCreationTime = new Date(session.user.created_at).getTime();
+        const now = new Date().getTime();
+        // Check if the user account was created in the last 60 seconds.
+        const isNewUser = (now - userCreationTime) < 60000;
 
-          if (isNewUser) {
-            // New user - redirect to dashboard
-            console.log('New user detected, redirecting to dashboard')
-            router.push('/dashboard')
-          } else {
-            // Existing user trying to sign up again
-            console.log('Existing user detected')
-            setError("An account with this email already exists. Please log in instead.")
-            await supabase.auth.signOut()
-            setIsLoading(false)
-          }
-        } catch (err) {
-          console.error('Error handling auth state change:', err)
-          setError("An error occurred during authentication. Please try again.")
-          await supabase.auth.signOut()
-          setIsLoading(false)
+        if (isNewUser) {
+          // If it's a new user, redirect them to the dashboard.
+          router.push('/dashboard');
+        } else {
+          // If it's an existing user, show an error and sign them out to force a login.
+          setError("User already registered. Please log in.");
+          await supabase.auth.signOut();
+          setIsLoading(false);
         }
       }
+    });
 
-      // Handle sign-out events
-      if (event === 'SIGNED_OUT') {
-        console.log('User signed out')
-      }
-
-      // Handle password recovery
-      if (event === 'PASSWORD_RECOVERY') {
-        console.log('Password recovery initiated')
-      }
-
-      // Handle token refresh
-      if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed')
-      }
-
-      // Handle user updated
-      if (event === 'USER_UPDATED') {
-        console.log('User updated')
-      }
-    })
-
-    // Cleanup listener on unmount
+    // Cleanup the listener when the component unmounts
     return () => {
-      authListener.subscription.unsubscribe()
-    }
-  }, [router])
+      authListener.subscription.unsubscribe();
+    };
+  }, [router]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -146,262 +105,71 @@ export default function SignUpPage() {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     setError("")
-    setSuccess("")
   }
 
-  // ✅ Email validation helper
-  const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
-
-  // ✅ Password strength validation
-  const validatePasswordStrength = (password: string): { isValid: boolean; message: string } => {
-    if (password.length < 8) {
-      return { isValid: false, message: "Password must be at least 8 characters long" }
-    }
-    if (!/[A-Z]/.test(password)) {
-      return { isValid: false, message: "Password must contain at least one uppercase letter" }
-    }
-    if (!/[a-z]/.test(password)) {
-      return { isValid: false, message: "Password must contain at least one lowercase letter" }
-    }
-    if (!/[0-9]/.test(password)) {
-      return { isValid: false, message: "Password must contain at least one number" }
-    }
-    return { isValid: true, message: "" }
-  }
-
-  // ✅ Check if user already exists
-  const checkUserExists = async (email: string): Promise<boolean> => {
-    try {
-      // Attempt to sign in to check if user exists
-      // This is a safe way to check without exposing user data
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: 'dummy-password-check-only-ignore-error',
-      })
-      
-      // If we get any response other than "Invalid login credentials", user exists
-      if (error && error.message !== 'Invalid login credentials') {
-        return true
-      }
-      
-      return false
-    } catch (err) {
-      console.error('Error checking user existence:', err)
-      return false
-    }
-  }
-
-  // ✅ Enhanced manual sign-up with comprehensive validation
+  // ✅ Handles manual sign-up (email/password)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
-    setSuccess("")
 
-    try {
-      // Trim whitespace from inputs
-      const trimmedName = formData.name.trim()
-      const trimmedEmail = formData.email.trim().toLowerCase()
-      const trimmedPassword = formData.password.trim()
-      const trimmedConfirmPassword = formData.confirmPassword.trim()
-
-      // ✅ Comprehensive validation
-      if (!trimmedName) {
-        setError("Full name is required")
-        setIsLoading(false)
-        return
-      }
-
-      if (trimmedName.length < 2) {
-        setError("Full name must be at least 2 characters long")
-        setIsLoading(false)
-        return
-      }
-
-      if (!trimmedEmail) {
-        setError("Email address is required")
-        setIsLoading(false)
-        return
-      }
-
-      if (!isValidEmail(trimmedEmail)) {
-        setError("Please enter a valid email address")
-        setIsLoading(false)
-        return
-      }
-
-      if (!trimmedPassword) {
-        setError("Password is required")
-        setIsLoading(false)
-        return
-      }
-
-      // Validate password strength
-      const passwordValidation = validatePasswordStrength(trimmedPassword)
-      if (!passwordValidation.isValid) {
-        setError(passwordValidation.message)
-        setIsLoading(false)
-        return
-      }
-
-      if (!trimmedConfirmPassword) {
-        setError("Please confirm your password")
-        setIsLoading(false)
-        return
-      }
-
-      if (trimmedPassword !== trimmedConfirmPassword) {
-        setError("Passwords do not match")
-        setIsLoading(false)
-        return
-      }
-
-      // ✅ Attempt to sign up the user
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: trimmedEmail,
-        password: trimmedPassword,
-        options: {
-          data: { 
-            full_name: trimmedName,
-            display_name: trimmedName,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-
-      // ✅ Handle sign-up errors comprehensively
-      if (signUpError) {
-        console.error('Sign-up error:', signUpError)
-        
-        // Handle specific error cases
-        if (signUpError.message.includes('already registered') || 
-            signUpError.message.includes('already been registered') ||
-            signUpError.message.includes('User already registered')) {
-          setError("An account with this email already exists. Please log in instead.")
-          setIsLoading(false)
-          return
-        }
-
-        if (signUpError.message.includes('rate limit')) {
-          setError("Too many sign-up attempts. Please try again later.")
-          setIsLoading(false)
-          return
-        }
-
-        if (signUpError.message.includes('invalid email')) {
-          setError("Invalid email address format")
-          setIsLoading(false)
-          return
-        }
-
-        if (signUpError.message.includes('password')) {
-          setError("Password does not meet security requirements")
-          setIsLoading(false)
-          return
-        }
-
-        // Generic error fallback
-        setError(signUpError.message || "An error occurred during sign-up. Please try again.")
-        setIsLoading(false)
-        return
-      }
-
-      // ✅ Handle successful sign-up
-      if (data.user) {
-        // Check if email confirmation is required
-        if (data.user.identities && data.user.identities.length === 0) {
-          // User already exists (sign-up returns user but no identities)
-          setError("An account with this email already exists. Please log in instead.")
-          setIsLoading(false)
-          return
-        }
-
-        // Check if session was created (email confirmation disabled)
-        if (data.session) {
-          // Auto-confirmed, redirect to dashboard
-          setSuccess("Account created successfully! Redirecting to dashboard...")
-          setTimeout(() => {
-            router.push('/dashboard')
-          }, 1500)
-        } else {
-          // Email confirmation required
-          setSuccess("Account created successfully! Please check your email to verify your account before logging in.")
-          
-          // Clear form
-          setFormData({
-            name: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-          })
-          
-          // Redirect to login after showing success message
-          setTimeout(() => {
-            router.push('/auth/login')
-          }, 3000)
-        }
-      } else {
-        setError("An unexpected error occurred. Please try again.")
-      }
-
+    // Basic form validation
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError("All fields are required")
       setIsLoading(false)
-
-    } catch (err: any) {
-      console.error('Unexpected error during sign-up:', err)
-      setError("An unexpected error occurred. Please try again later.")
-      setIsLoading(false)
+      return
     }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match")
+      setIsLoading(false)
+      return
+    }
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters")
+      setIsLoading(false)
+      return
+    }
+
+    // Attempt to sign up the user
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: { full_name: formData.name },
+      },
+    })
+
+    // ✅ Supabase automatically checks for existing users. If the email is already in use,
+    // it will return an error, which we display to the user.
+    if (signUpError) {
+      setError(signUpError.message) // e.g., "User already registered"
+      setIsLoading(false)
+      return
+    }
+
+    // On successful manual registration, prompt for verification and redirect to login
+    alert("Signup successful! Please check your email to verify your account.")
+    setIsLoading(false)
+    router.push("/auth/login")
   }
 
-  // ✅ Enhanced Google Sign-Up with comprehensive error handling
+  // ✅ Handles the start of the Google Sign-Up flow
   const handleGoogleSignUp = async () => {
     setIsLoading(true)
     setError("")
-    setSuccess("")
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        // Redirect back to this same page. The `useEffect` hook will then handle the logic.
+        redirectTo: window.location.href,
+      },
+    })
 
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          // Redirect back to this page for new user detection
-          redirectTo: `${window.location.origin}/auth/signup`,
-          // Request additional scopes if needed
-          scopes: 'email profile',
-          // Query params to help distinguish sign-up vs login
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      })
-
-      if (error) {
-        console.error('Google OAuth error:', error)
-        
-        // Handle specific OAuth errors
-        if (error.message.includes('popup')) {
-          setError("Popup was blocked. Please allow popups for this site and try again.")
-        } else if (error.message.includes('network')) {
-          setError("Network error. Please check your internet connection and try again.")
-        } else {
-          setError(error.message || "Failed to sign up with Google. Please try again.")
-        }
-        
-        setIsLoading(false)
-        return
-      }
-
-      // OAuth redirect will happen automatically
-      // The onAuthStateChange listener will handle the rest
-
-    } catch (err: any) {
-      console.error('Unexpected error during Google sign-up:', err)
-      setError("An unexpected error occurred. Please try again later.")
+    if (error) {
+      setError(error.message)
       setIsLoading(false)
     }
+    // On success, the user is redirected to Google, and then back to the `redirectTo` URL.
   }
 
   const calculateEyePosition = (centerX: number, centerY: number) => {
@@ -657,29 +425,15 @@ export default function SignUpPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3">
-              {/* ✅ Enhanced error display */}
               {error && (
-                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-start gap-2">
-                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* ✅ Success message display */}
-              {success && (
-                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-start gap-2">
-                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>{success}</span>
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
+                  {error}
                 </div>
               )}
 
               <div className="space-y-1">
                 <Label htmlFor="name" className="text-slate-300 text-xs">
-                  Full Name <span className="text-red-400">*</span>
+                  Full Name
                 </Label>
                 <Input
                   id="name"
@@ -690,15 +444,12 @@ export default function SignUpPage() {
                   onChange={handleChange}
                   className="h-10 bg-slate-800/50 border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-white placeholder:text-slate-500 rounded-lg text-sm"
                   disabled={isLoading}
-                  required
-                  minLength={2}
-                  maxLength={100}
                 />
               </div>
 
               <div className="space-y-1">
                 <Label htmlFor="email" className="text-slate-300 text-xs">
-                  Email <span className="text-red-400">*</span>
+                  Email
                 </Label>
                 <Input
                   id="email"
@@ -709,14 +460,12 @@ export default function SignUpPage() {
                   onChange={handleChange}
                   className="h-10 bg-slate-800/50 border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-white placeholder:text-slate-500 rounded-lg text-sm"
                   disabled={isLoading}
-                  required
-                  autoComplete="email"
                 />
               </div>
 
               <div className="space-y-1">
                 <Label htmlFor="password" className="text-slate-300 text-xs">
-                  Password <span className="text-red-400">*</span>
+                  Password
                 </Label>
                 <div className="relative">
                   <Input
@@ -730,27 +479,20 @@ export default function SignUpPage() {
                     onBlur={() => setIsPasswordFocused(false)}
                     className="h-10 pr-10 bg-slate-800/50 border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-white placeholder:text-slate-500 rounded-lg text-sm"
                     disabled={isLoading}
-                    required
-                    minLength={8}
-                    autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-emerald-400 transition-colors"
-                    tabIndex={-1}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">
-                  Must be 8+ characters with uppercase, lowercase, and number
-                </p>
               </div>
 
               <div className="space-y-1">
                 <Label htmlFor="confirmPassword" className="text-slate-300 text-xs">
-                  Confirm Password <span className="text-red-400">*</span>
+                  Confirm Password
                 </Label>
                 <div className="relative">
                   <Input
@@ -764,15 +506,11 @@ export default function SignUpPage() {
                     onBlur={() => setIsConfirmPasswordFocused(false)}
                     className="h-10 pr-10 bg-slate-800/50 border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-white placeholder:text-slate-500 rounded-lg text-sm"
                     disabled={isLoading}
-                    required
-                    minLength={8}
-                    autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-emerald-400 transition-colors"
-                    tabIndex={-1}
                   >
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -787,7 +525,7 @@ export default function SignUpPage() {
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Creating Account...</span>
+                    <span>Processing...</span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-2">
@@ -802,7 +540,7 @@ export default function SignUpPage() {
                   <div className="w-full border-t border-slate-700"></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="px-2 text-[10px] text-slate-500 bg-slate-900">or continue with</span>
+                  <span className="px-2 text-[10px] text-slate-500 bg-slate-900">or</span>
                 </div>
               </div>
 
@@ -825,19 +563,8 @@ export default function SignUpPage() {
 
             <p className="text-center text-xs text-slate-400 pt-2">
               Already have an account?{" "}
-              <Link href="/auth/login" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors">
+              <Link href="/auth/login" className="text-emerald-400 hover:text-emerald-300 font-semibold">
                 Sign In
-              </Link>
-            </p>
-
-            <p className="text-center text-[10px] text-slate-500 pt-1">
-              By signing up, you agree to our{" "}
-              <Link href="/terms" className="text-slate-400 hover:text-slate-300 underline">
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className="text-slate-400 hover:text-slate-300 underline">
-                Privacy Policy
               </Link>
             </p>
           </div>
