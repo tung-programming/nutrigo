@@ -30,7 +30,7 @@ export async function getOrFetchProductByBarcode(barcode: string) {
   if (found) return found;
 
   // Fetch from OFF
-  const offProduct = await fetchByBarcode(barcode);
+  const offProduct = await getProductByBarcode(barcode);
   if (!offProduct) return null;
 
   const normalized = normalizeOFF(offProduct, barcode);
