@@ -34,6 +34,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [authError, setAuthError] = useState<string>("")
 
+  
   useEffect(() => {
     // ✅ CRITICAL FIX: Fetch user data with proper error handling
     const fetchUser = async () => {
@@ -125,6 +126,7 @@ export default function DashboardPage() {
 
     fetchUser()
   }, [supabase, router])
+  
 
   // ✅ Show error state if auth fails
   if (authError) {

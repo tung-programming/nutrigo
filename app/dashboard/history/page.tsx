@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Calendar, Trash2, Filter, TrendingUp, Award, BarChart3, Sparkles } from "lucide-react"
+import { Search, Calendar, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 interface ScanHistory {
@@ -12,12 +12,13 @@ interface ScanHistory {
   brand: string
   score: number
   category: string
-  date: string
+  date: string // Note: For real date sorting, use Date objects
   calories: number
   sugar: number
 }
 
 const mockHistory: ScanHistory[] = [
+  // ... (your mockHistory data remains the same)
   {
     id: 1,
     name: "Coca Cola",
@@ -80,23 +81,54 @@ const mockHistory: ScanHistory[] = [
   },
 ]
 
+// UPDATED: Define a type for all our sort keys
+type SortKey =
+  | "date"
+  | "score"
+  | "calories-asc"
+  | "calories-desc"
+  | "sugar-asc"
+  | "sugar-desc"
+
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCategory, setFilterCategory] = useState<string | null>(null)
-  const [sortBy, setSortBy] = useState<"date" | "score">("date")
+  // UPDATED: Use the new SortKey type
+  const [sortBy, setSortBy] = useState<SortKey>("date")
+  const [selectedItem, setSelectedItem] = useState<ScanHistory | null>(null)
 
   const filteredHistory = mockHistory
     .filter((item) => {
-      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesSearch = item.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
       const matchesCategory = !filterCategory || item.category === filterCategory
       return matchesSearch && matchesCategory
     })
+    // UPDATED: Expanded sort logic
     .sort((a, b) => {
-      if (sortBy === "score") return b.score - a.score
-      return 0
+      switch (sortBy) {
+        case "score":
+          return b.score - a.score
+        case "calories-asc":
+          return a.calories - b.calories
+        case "calories-desc":
+          return b.calories - a.calories
+        case "sugar-asc":
+          return a.sugar - b.sugar
+        case "sugar-desc":
+          return b.sugar - b.sugar
+        case "date":
+        default:
+          // Since dates are strings, we sort by ID as a proxy for "newest"
+          // (assuming higher ID is newer)
+          return b.id - a.id
+      }
     })
 
-  const categories = Array.from(new Set(mockHistory.map((item) => item.category)))
+  const categories = Array.from(
+    new Set(mockHistory.map((item) => item.category))
+  )
 
   const getScoreColor = (score: number) => {
     if (score >= 70) return "text-emerald-400"
@@ -111,200 +143,202 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: "2s" }}></div>
+    <div className="p-4 md:p-8 space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground">Scan History</h1>
+        <p className="text-muted-foreground">View all your previous food scans and nutrition analysis</p>
       </div>
 
-      <div className="p-4 md:p-8 lg:p-12 space-y-8 relative z-10">
-        {/* Header */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center shadow-xl shadow-emerald-500/25">
-              <BarChart3 size={28} className="text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl md:text-5xl font-black text-white">
-                Scan History
-              </h1>
-              <p className="text-slate-400 text-lg">View all your previous food scans and nutrition analysis</p>
-            </div>
+      {/* Search and Filters */}
+      <Card className="p-6 border-border bg-card/50 backdrop-blur-sm space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-3 text-muted-foreground" size={18} />
+            <Input
+              placeholder="Search by product name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-background/50 border-border"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as "date" | "score")}
+              className="px-4 py-2 rounded-lg bg-background/50 border border-border text-foreground"
+            >
+              <option value="date">Sort by Date</option>
+              <option value="score">Sort by Score</option>
+            </select>
           </div>
         </div>
 
-        {/* Search and Filters */}
-        <Card className="p-6 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 shadow-xl space-y-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-4 text-slate-500" size={20} />
-              <Input
-                placeholder="Search by product name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-14 bg-slate-800/50 border-slate-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-white placeholder:text-slate-500 rounded-xl text-base"
-              />
-            </div>
-
-            <div className="flex gap-3">
-              <div className="relative">
-                <Filter className="absolute left-3 top-4 text-slate-500" size={18} />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as "date" | "score")}
-                  className="pl-10 pr-4 py-3.5 h-14 rounded-xl bg-slate-800/50 border border-slate-700 text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none cursor-pointer"
-                >
-                  <option value="date">Sort by Date</option>
-                  <option value="score">Sort by Score</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex flex-wrap gap-3">
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setFilterCategory(null)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              filterCategory === null
+                ? "bg-primary text-primary-foreground"
+                : "bg-background/50 border border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All
+          </button>
+          {categories.map((category) => (
             <button
-              onClick={() => setFilterCategory(null)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                filterCategory === null
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30"
-                  : "bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600"
+              key={category}
+              onClick={() => setFilterCategory(category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                filterCategory === category
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-background/50 border border-border text-muted-foreground hover:text-foreground"
               }`}
             >
-              All
+              {category}
             </button>
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setFilterCategory(category)}
-                className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                  filterCategory === category
-                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30"
-                    : "bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          ))}
+        </div>
+      </Card>
+
+      {/* History List */}
+      <div className="space-y-3">
+        {filteredHistory.length > 0 ? (
+          filteredHistory.map((item) => (
+            <Card
+              key={item.id}
+              className="p-4 border-border bg-card/50 backdrop-blur-sm hover:border-primary/30 transition"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-foreground">{item.name}</h3>
+                    <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                      {item.category}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{item.brand}</p>
+                  <div className="flex gap-4 text-xs text-muted-foreground pt-1">
+                    <span className="flex items-center gap-1">
+                      <Calendar size={14} /> {item.date}
+                    </span>
+                    <span>{item.calories} cal</span>
+                    <span>{item.sugar}g sugar</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`px-4 py-2 rounded-lg font-bold text-lg ${getScoreBg(item.score)} ${getScoreColor(item.score)}`}
+                  >
+                    {item.score}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 size={18} />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <Card className="p-12 border-border bg-card/50 backdrop-blur-sm text-center">
+            <p className="text-muted-foreground">No scans found. Start scanning to build your history!</p>
+          </Card>
+        )}
+      </div>
+
+      {/* Stats Summary */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <Card className="p-6 border-border bg-card/50 backdrop-blur-sm">
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Total Scans</p>
+            <p className="text-3xl font-bold text-foreground">{mockHistory.length}</p>
           </div>
         </Card>
 
-        {/* History List */}
-        <div className="space-y-4">
-          {filteredHistory.length > 0 ? (
-            filteredHistory.map((item) => (
-              <Card
-                key={item.id}
-                className="group p-6 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700 hover:border-emerald-500/40 shadow-xl transition-all duration-300"
-              >
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="font-bold text-white text-lg">{item.name}</h3>
-                      <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-semibold">
-                        {item.category}
-                      </span>
-                    </div>
-                    <p className="text-sm text-slate-400">{item.brand}</p>
-                    <div className="flex flex-wrap gap-4 text-sm text-slate-500 pt-2">
-                      <span className="flex items-center gap-2">
-                        <Calendar size={16} className="text-emerald-400" /> 
-                        <span className="text-slate-300">{item.date}</span>
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        <span className="text-slate-300">{item.calories} cal</span>
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
-                        <span className="text-slate-300">{item.sugar}g sugar</span>
-                      </span>
-                    </div>
-                  </div>
+        <Card className="p-6 border-border bg-card/50 backdrop-blur-sm">
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Average Score</p>
+            <p className="text-3xl font-bold text-accent">
+              {Math.round(mockHistory.reduce((sum, item) => sum + item.score, 0) / mockHistory.length)}
+            </p>
+          </div>
+        </Card>
 
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`px-6 py-3 rounded-xl font-black text-2xl ${getScoreBg(item.score)} ${getScoreColor(item.score)} shadow-lg`}
-                    >
-                      {item.score}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all p-3 rounded-xl"
-                    >
-                      <Trash2 size={20} />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))
-          ) : (
-            <Card className="p-16 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700 text-center">
-              <div className="space-y-4">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto">
-                  <Sparkles size={40} className="text-emerald-400" />
-                </div>
-                <p className="text-slate-400 text-lg">No scans found. Start scanning to build your history!</p>
-              </div>
-            </Card>
-          )}
-        </div>
-
-        {/* Stats Summary */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card className="group p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/40 shadow-xl transition-all duration-300">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-slate-400">Total Scans</span>
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <BarChart3 size={20} className="text-emerald-400" />
-                </div>
-              </div>
-              <p className="text-4xl font-black text-white">{mockHistory.length}</p>
-              <div className="flex items-center gap-2 text-emerald-400 text-sm">
-                <TrendingUp size={16} />
-                <span>All time</span>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="group p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-teal-500/20 hover:border-teal-500/40 shadow-xl transition-all duration-300">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-slate-400">Average Score</span>
-                <div className="w-10 h-10 rounded-lg bg-teal-500/20 border border-teal-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <TrendingUp size={20} className="text-teal-400" />
-                </div>
-              </div>
-              <p className="text-4xl font-black text-white">
-                {Math.round(mockHistory.reduce((sum, item) => sum + item.score, 0) / mockHistory.length)}
-              </p>
-              <div className="flex items-center gap-2 text-teal-400 text-sm">
-                <Award size={16} />
-                <span>Great progress!</span>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="group p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-cyan-500/20 hover:border-cyan-500/40 shadow-xl transition-all duration-300">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-slate-400">Healthy Choices</span>
-                <div className="w-10 h-10 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Award size={20} className="text-cyan-400" />
-                </div>
-              </div>
-              <p className="text-4xl font-black text-white">{mockHistory.filter((item) => item.score >= 70).length}</p>
-              <div className="flex items-center gap-2 text-cyan-400 text-sm">
-                <Sparkles size={16} />
-                <span>{Math.round((mockHistory.filter((item) => item.score >= 70).length / mockHistory.length) * 100)}% success rate</span>
-              </div>
-            </div>
-          </Card>
-        </div>
+        <Card className="p-6 border-border bg-card/50 backdrop-blur-sm">
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Healthy Choices</p>
+            <p className="text-3xl font-bold text-accent">{mockHistory.filter((item) => item.score >= 70).length}</p>
+          </div>
+        </Card>
       </div>
+
+      {/* Details Modal */}
+      {/* ... (modal is unchanged) ... */}
+      <Dialog
+        open={!!selectedItem}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setSelectedItem(null)
+          }
+        }}
+      >
+        <DialogContent className="bg-card border-border">
+          {selectedItem && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl text-foreground">
+                  {selectedItem.name}
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  {selectedItem.brand}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Score</span>
+                  <span
+                    className={`font-bold text-3xl ${getScoreColor(
+                      selectedItem.score
+                    )}`}
+                  >
+                    {selectedItem.score}
+                  </span>
+                </div>
+                <div className="space-y-2 pt-2">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Category</span>
+                    <span className="text-foreground">
+                      {selectedItem.category}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Calories</span>
+                    <span className="text-foreground">
+                      {selectedItem.calories} cal
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Sugar</span>
+                    <span className="text-foreground">
+                      {selectedItem.sugar}g sugar
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Scanned</span>
+                    <span className="text-foreground">{selectedItem.date}</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
