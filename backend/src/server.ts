@@ -1,16 +1,18 @@
-import { config } from "dotenv";
-config();
-console.log("Loaded MONGO_URI:", process.env.MONGO_URI);
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import scanRoutes from "./routes/scan.routes";
 
-import app from "./app";
-import mongoose from "mongoose";
+dotenv.config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// ✅ Mount the scan routes here
+app.use("/api/scan", scanRoutes);
 
 const PORT = process.env.PORT || 4000;
-
-mongoose
-  .connect(process.env.MONGO_URI!)
-  .then(() => {
-    console.log("✅ Connected to MongoDB");
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-  })
-  .catch((err) => console.error("MongoDB connection error:", err));
+app.listen(PORT, () => {
+  console.log(`🚀 NutriGo backend running on port ${PORT}`);
+});

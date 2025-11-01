@@ -1,6 +1,6 @@
 import ProductModel from "../models/product.model";
-import { fetchByBarcode } from "../lib/openFoodFacts";
-import { calculateHealthScore } from "../utils/healthScore";
+import { getProductByBarcode } from "../lib/openFoodFacts";
+import { calculateHealthScore, getScoreInterpretation } from "../utils/healthScoreCalculator";
 
 type Normalized = {
   barcode?: string;
@@ -35,7 +35,7 @@ export async function getOrFetchProductByBarcode(barcode: string) {
 
   const normalized = normalizeOFF(offProduct, barcode);
   normalized.health_score = calculateHealthScore(normalized.nutrition);
-
+  const { rating, message, color } = getScoreInterpretation(normalized.health_score);
   // Save to DB (ignore unique errors)
   try {
     const created = await ProductModel.create(normalized);
