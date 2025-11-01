@@ -1,19 +1,17 @@
 "use client"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-
-
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowRight, Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { ArrowRight, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
-
 
 export default function LoginPage() {
   const router = useRouter()
+  const supabase = createClientComponentClient()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -21,6 +19,9 @@ export default function LoginPage() {
     password: "",
   })
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [showErrorPopup, setShowErrorPopup] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   
@@ -29,7 +30,6 @@ export default function LoginPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isHappy, setIsHappy] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-
 
   const [stars] = useState(() => {
     if (typeof window === 'undefined') return []
@@ -43,11 +43,29 @@ export default function LoginPage() {
     }))
   })
 
-
   useEffect(() => {
     setIsMounted(true)
-  }, [])
 
+    // ✅ Listen for auth state changes (for OAuth redirects)
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event, 'Session:', session)
+
+      if (event === 'SIGNED_IN' && session) {
+        // ✅ Show success popup for OAuth login
+        setShowSuccessPopup(true)
+        
+        // Redirect to dashboard after 2 seconds
+        setTimeout(() => {
+          router.push('/dashboard')
+          router.refresh()
+        }, 2000)
+      }
+    })
+
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [router, supabase])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -60,11 +78,9 @@ export default function LoginPage() {
       }
     }
 
-
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [isPasswordFocused])
-
 
   useEffect(() => {
     if (formData.email && formData.password) {
@@ -74,72 +90,99 @@ export default function LoginPage() {
     }
   }, [formData])
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     setError("")
+    setSuccess("")
   }
 
-
-  
-  // ✅ Handles manual user login and displays the correct error message
+  // ✅ Enhanced manual user login with unregistered user detection
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
+    setSuccess("")
 
     if (!formData.email || !formData.password) {
-      setError("Email and password are required");
-      setIsLoading(false);
-      setIsHappy(false);
-      return;
+      setError("Email and password are required")
+      setIsLoading(false)
+      setIsHappy(false)
+      return
     }
 
-    const supabase = createClientComponentClient();
-
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error: signInError, data } = await supabase.auth.signInWithPassword({
       email: formData.email,
       password: formData.password,
-    });
+    })
 
-    if (error) {
-      // ✅ Set the custom error message for failed login attempts
-      if (error.message === 'Invalid login credentials') {
-        setError("User not registered. Please sign up.");
+    if (signInError) {
+      // ✅ Handle different error scenarios
+      if (signInError.message === 'Invalid login credentials') {
+        // This could be wrong password OR user doesn't exist
+        // Show error popup for unregistered user
+        setShowErrorPopup(true)
+        setIsLoading(false)
+        setIsHappy(false)
+        
+        setTimeout(() => {
+          router.push('/auth/signup')
+        }, 3000)
+        return
+      } else if (signInError.message.includes('Email not confirmed')) {
+        setError("Please verify your email address before logging in.")
+        setIsLoading(false)
+        setIsHappy(false)
+        return
       } else {
-        setError(error.message); // Handles other errors like "Email not confirmed"
+        setError(signInError.message)
+        setIsLoading(false)
+        setIsHappy(false)
+        return
       }
-      setIsLoading(false);
-      setIsHappy(false);
-      return;
     }
 
-    setIsLoading(false);
-    router.push("/dashboard");
-    router.refresh(); // Refresh the session on the client
-  };
+    // ✅ Success! Show popup
+    if (data.session) {
+      setShowSuccessPopup(true)
+      setIsLoading(false)
+      
+      // Store remember me preference
+      if (rememberMe) {
+        localStorage.setItem('rememberMe', 'true')
+      }
+      
+      // Redirect to dashboard after 2 seconds
+      setTimeout(() => {
+        router.push("/dashboard")
+        router.refresh()
+      }, 2000)
+    }
+  }
 
-  // ✅ Handles Google Sign-In and redirects to the dashboard
+  // ✅ Google Sign-In
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    setError("");
-    const supabase = createClientComponentClient();
+    setIsLoading(true)
+    setError("")
+    setSuccess("")
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/dashboard`
+        redirectTo: `${window.location.origin}/auth/login`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'select_account',
+        },
       }
-    });
+    })
 
     if (error) {
-      setError("Could not log in with Google. Please try again.");
-      setIsLoading(false);
+      setError("Could not log in with Google. Please try again.")
+      setIsLoading(false)
     }
-    // On success, Supabase handles the redirect.
-  };
-
+    // On success, Supabase handles the redirect and onAuthStateChange will show popup
+  }
 
   const calculateEyePosition = (centerX: number, centerY: number) => {
     if (isPasswordFocused) return { x: 0, y: 0 }
@@ -155,9 +198,89 @@ export default function LoginPage() {
     }
   }
 
-
   return (
     <div ref={containerRef} className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* ✅ Success Popup Modal */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-emerald-500/50 rounded-2xl p-8 max-w-md w-full shadow-2xl shadow-emerald-500/20 animate-in zoom-in duration-300">
+            <div className="flex flex-col items-center text-center space-y-4">
+              {/* Success Icon */}
+              <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center animate-in zoom-in duration-500 delay-100">
+                <CheckCircle2 size={48} className="text-emerald-400 animate-in zoom-in duration-500 delay-200" />
+              </div>
+              
+              {/* Success Message */}
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-white">Login Successful! 🎉</h2>
+                <p className="text-slate-300 text-sm">
+                  Welcome back! You've been successfully logged in.
+                </p>
+                <p className="text-emerald-400 text-sm font-semibold">
+                  Redirecting to your dashboard...
+                </p>
+              </div>
+
+              {/* Redirect Message */}
+              <div className="pt-4">
+                <div className="flex items-center gap-2 text-slate-400 text-xs">
+                  <div className="w-4 h-4 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+                  <span>Taking you to dashboard...</span>
+                </div>
+              </div>
+
+              {/* Manual Redirect Button */}
+              <Button
+                onClick={() => {
+                  router.push('/dashboard')
+                  router.refresh()
+                }}
+                className="mt-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:via-teal-400 hover:to-cyan-400 text-white font-semibold px-6 py-2 rounded-lg shadow-lg shadow-emerald-500/25 transition-all duration-300"
+              >
+                Go to Dashboard Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Error Popup Modal for Unregistered User */}
+      {showErrorPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-orange-500/50 rounded-2xl p-8 max-w-md w-full shadow-2xl shadow-orange-500/20 animate-in zoom-in duration-300">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-orange-500/20 flex items-center justify-center animate-in zoom-in duration-500 delay-100">
+                <AlertCircle size={48} className="text-orange-400 animate-in zoom-in duration-500 delay-200" />
+              </div>
+              
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-white">User Not Registered!</h2>
+                <p className="text-slate-300 text-sm">
+                  We couldn't find an account with these credentials.
+                </p>
+                <p className="text-orange-400 text-sm font-semibold">
+                  Please sign up to create an account.
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <div className="flex items-center gap-2 text-slate-400 text-xs">
+                  <div className="w-4 h-4 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin"></div>
+                  <span>Redirecting to signup page...</span>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => router.push('/auth/signup')}
+                className="mt-4 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-400 hover:via-amber-400 hover:to-yellow-400 text-white font-semibold px-6 py-2 rounded-lg shadow-lg shadow-orange-500/25 transition-all duration-300"
+              >
+                Go to Sign Up Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Back Button - Fixed Position */}
       <Link 
         href="/"
@@ -166,7 +289,6 @@ export default function LoginPage() {
         <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform duration-300" />
         <span className="text-sm font-medium">Back</span>
       </Link>
-
 
       {/* Animated Background with Stars */}
       <div className="absolute inset-0">
@@ -187,7 +309,6 @@ export default function LoginPage() {
         ))}
       </div>
 
-
       <style jsx>{`
         @keyframes twinkle {
           0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -206,9 +327,8 @@ export default function LoginPage() {
         }
       `}</style>
 
-
       <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-0 items-center relative z-10">
-        {/* Left Side - Characters (SAME AS YOUR CODE) */}
+        {/* Left Side - Characters (keep all existing characters) */}
         <div className="hidden lg:flex items-center justify-center bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl rounded-l-3xl border-l border-t border-b border-emerald-500/20 p-12 relative overflow-visible h-[700px]">
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-0 left-0 w-full h-full" style={{
@@ -216,7 +336,6 @@ export default function LoginPage() {
               backgroundSize: '30px 30px'
             }}></div>
           </div>
-
 
           <div className="relative w-full h-full flex items-center justify-center">
             <div className="relative w-[420px] h-[380px]">
@@ -262,7 +381,6 @@ export default function LoginPage() {
                 ></div>
               </div>
 
-
               {/* Character 2: Purple Rectangle */}
               <div 
                 className="absolute bottom-0 left-20 w-32 h-80 bg-gradient-to-b from-purple-500 to-purple-600 rounded-t-3xl shadow-2xl transition-all duration-500 z-10 flex flex-col items-center pt-8"
@@ -304,7 +422,6 @@ export default function LoginPage() {
                 ></div>
               </div>
 
-
               {/* Character 3: WHITE Rectangle */}
               <div 
                 className="absolute bottom-0 left-36 w-36 h-40 bg-gradient-to-b from-white to-gray-100 rounded-t-3xl shadow-2xl border-2 border-gray-200 transition-all duration-500 z-20 flex flex-col items-center pt-16"
@@ -345,7 +462,6 @@ export default function LoginPage() {
                   }`}
                 ></div>
               </div>
-
 
               {/* Character 4: Yellow */}
               <div 
@@ -391,7 +507,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-
         {/* Right Side - Login Form */}
         <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl rounded-r-3xl lg:rounded-l-none rounded-3xl border border-emerald-500/20 p-8 md:p-12 shadow-2xl h-[700px] flex flex-col justify-center">
           <div className="space-y-7 max-w-md mx-auto w-full">
@@ -400,14 +515,12 @@ export default function LoginPage() {
               <p className="text-slate-400 text-sm">Please enter your details</p>
             </div>
 
-
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
                 <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
                   {error}
                 </div>
               )}
-
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-300 font-semibold text-sm">
@@ -426,7 +539,6 @@ export default function LoginPage() {
                   disabled={isLoading}
                 />
               </div>
-
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-slate-300 font-semibold text-sm">
@@ -455,7 +567,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <input
@@ -475,7 +586,6 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-
               <Button
                 type="submit"
                 className="w-full h-12 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:via-teal-400 hover:to-cyan-400 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 border-0"
@@ -493,6 +603,14 @@ export default function LoginPage() {
                 )}
               </Button>
 
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-700"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="px-2 text-xs text-slate-500 bg-slate-900">or continue with</span>
+                </div>
+              </div>
 
               <Button
                 type="button"
@@ -510,7 +628,6 @@ export default function LoginPage() {
                 <span>Log in with Google</span>
               </Button>
             </form>
-
 
             <p className="text-center text-sm text-slate-400">
               Don't have an account?{" "}

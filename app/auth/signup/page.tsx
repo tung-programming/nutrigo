@@ -1,16 +1,12 @@
 "use client"
 
 import { supabase } from "@/lib/supabaseClient"
-
-
-
-
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowRight, Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { ArrowRight, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function SignUpPage() {
@@ -25,6 +21,9 @@ export default function SignUpPage() {
     confirmPassword: "",
   })
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [showErrorPopup, setShowErrorPopup] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   
   const [isPasswordFocused, setIsPasswordFocused] = useState(false)
@@ -48,35 +47,65 @@ export default function SignUpPage() {
   useEffect(() => {
     setIsMounted(true)
 
-    // ✅ Handles the redirect logic after a user returns from Google OAuth
+    // ✅ OAuth redirect handling with duplicate user detection
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // This logic only runs when a user is signed in via the OAuth redirect
+      console.log('Auth event:', event, 'Session:', session)
+
       if (event === 'SIGNED_IN' && session) {
-        // Unsubscribe to prevent this from running on subsequent auth events in the app
-        authListener.subscription.unsubscribe();
+        try {
+          const user = session.user
+          
+          // ✅ Check if email is confirmed
+          if (!user.email_confirmed_at) {
+            console.log('Email not confirmed yet, signing out')
+            setError("Please verify your email address before accessing the dashboard.")
+            await supabase.auth.signOut()
+            setIsLoading(false)
+            return
+          }
 
-        const userCreationTime = new Date(session.user.created_at).getTime();
-        const now = new Date().getTime();
-        // Check if the user account was created in the last 60 seconds.
-        const isNewUser = (now - userCreationTime) < 60000;
+          // ✅ Check if user already existed (was created more than 5 seconds ago)
+          const userCreationTime = new Date(user.created_at).getTime()
+          const now = new Date().getTime()
+          const isNewUser = (now - userCreationTime) < 5000 // 5 seconds window for new user
 
-        if (isNewUser) {
-          // If it's a new user, redirect them to the dashboard.
-          router.push('/dashboard');
-        } else {
-          // If it's an existing user, show an error and sign them out to force a login.
-          setError("User already registered. Please log in.");
-          await supabase.auth.signOut();
-          setIsLoading(false);
+          if (!isNewUser) {
+            // ✅ User already registered - show error popup and redirect to login
+            console.log('User already registered, showing error popup')
+            setShowErrorPopup(true)
+            await supabase.auth.signOut()
+            
+            setTimeout(() => {
+              router.push('/auth/login')
+            }, 3000)
+            return
+          }
+
+          // ✅ New user - show success popup
+          console.log('New user signed up successfully via OAuth')
+          setShowSuccessPopup(true)
+          
+          // Sign out the user so they can log in properly
+          await supabase.auth.signOut()
+          
+          // Redirect to login after 3 seconds
+          setTimeout(() => {
+            router.push('/auth/login')
+          }, 3000)
+          
+        } catch (err) {
+          console.error('Error handling auth state change:', err)
+          setError("An error occurred during authentication. Please try again.")
+          await supabase.auth.signOut()
+          setIsLoading(false)
         }
       }
-    });
+    })
 
-    // Cleanup the listener when the component unmounts
     return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [router]);
+      authListener.subscription.unsubscribe()
+    }
+  }, [router])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -105,13 +134,15 @@ export default function SignUpPage() {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     setError("")
+    setSuccess("")
   }
 
-  // ✅ Handles manual sign-up (email/password)
+  // ✅ Enhanced manual sign-up with duplicate detection
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
+    setSuccess("")
 
     // Basic form validation
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
@@ -130,38 +161,89 @@ export default function SignUpPage() {
       return
     }
 
-    // Attempt to sign up the user
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: {
-        data: { full_name: formData.name },
-      },
-    })
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: { 
+            full_name: formData.name,
+            display_name: formData.name,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
 
-    // ✅ Supabase automatically checks for existing users. If the email is already in use,
-    // it will return an error, which we display to the user.
-    if (signUpError) {
-      setError(signUpError.message) // e.g., "User already registered"
+      if (signUpError) {
+        // ✅ Handle duplicate email error
+        if (signUpError.message.includes('already registered') || 
+            signUpError.message.includes('User already registered')) {
+          setShowErrorPopup(true)
+          setIsLoading(false)
+          
+          setTimeout(() => {
+            router.push('/auth/login')
+          }, 3000)
+          return
+        } else {
+          setError(signUpError.message)
+          setIsLoading(false)
+          return
+        }
+      }
+
+      if (data.user) {
+        // ✅ Check if user already exists (no new identity created)
+        if (data.user.identities && data.user.identities.length === 0) {
+          setShowErrorPopup(true)
+          setIsLoading(false)
+          
+          setTimeout(() => {
+            router.push('/auth/login')
+          }, 3000)
+          return
+        }
+
+        // ✅ New user created successfully - show success popup
+        setShowSuccessPopup(true)
+        
+        // Clear form
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        })
+        
+        // Redirect to login page after 3 seconds
+        setTimeout(() => {
+          router.push("/auth/login")
+        }, 3000)
+      }
+
       setIsLoading(false)
-      return
+    } catch (err: any) {
+      console.error('Unexpected error during sign-up:', err)
+      setError("An unexpected error occurred. Please try again.")
+      setIsLoading(false)
     }
-
-    // On successful manual registration, prompt for verification and redirect to login
-    alert("Signup successful! Please check your email to verify your account.")
-    setIsLoading(false)
-    router.push("/auth/login")
   }
 
-  // ✅ Handles the start of the Google Sign-Up flow
+  // ✅ Google sign-up
   const handleGoogleSignUp = async () => {
     setIsLoading(true)
     setError("")
+    setSuccess("")
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // Redirect back to this same page. The `useEffect` hook will then handle the logic.
-        redirectTo: window.location.href,
+        redirectTo: `${window.location.origin}/auth/signup`,
+        scopes: 'email profile',
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'select_account',
+        },
       },
     })
 
@@ -169,7 +251,6 @@ export default function SignUpPage() {
       setError(error.message)
       setIsLoading(false)
     }
-    // On success, the user is redirected to Google, and then back to the `redirectTo` URL.
   }
 
   const calculateEyePosition = (centerX: number, centerY: number) => {
@@ -190,6 +271,80 @@ export default function SignUpPage() {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* ✅ Success Popup Modal */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-emerald-500/50 rounded-2xl p-8 max-w-md w-full shadow-2xl shadow-emerald-500/20 animate-in zoom-in duration-300">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center animate-in zoom-in duration-500 delay-100">
+                <CheckCircle2 size={48} className="text-emerald-400 animate-in zoom-in duration-500 delay-200" />
+              </div>
+              
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-white">Account Created! 🎉</h2>
+                <p className="text-slate-300 text-sm">
+                  Your account has been successfully created.
+                </p>
+                <p className="text-emerald-400 text-sm font-semibold">
+                  Please log in to continue.
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <div className="flex items-center gap-2 text-slate-400 text-xs">
+                  <div className="w-4 h-4 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+                  <span>Redirecting to login page...</span>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => router.push('/auth/login')}
+                className="mt-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:via-teal-400 hover:to-cyan-400 text-white font-semibold px-6 py-2 rounded-lg shadow-lg shadow-emerald-500/25 transition-all duration-300"
+              >
+                Go to Login Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Error Popup Modal for Duplicate User */}
+      {showErrorPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-red-500/50 rounded-2xl p-8 max-w-md w-full shadow-2xl shadow-red-500/20 animate-in zoom-in duration-300">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center animate-in zoom-in duration-500 delay-100">
+                <AlertCircle size={48} className="text-red-400 animate-in zoom-in duration-500 delay-200" />
+              </div>
+              
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-white">Already Registered!</h2>
+                <p className="text-slate-300 text-sm">
+                  This email is already registered with us.
+                </p>
+                <p className="text-red-400 text-sm font-semibold">
+                  Please log in to continue.
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <div className="flex items-center gap-2 text-slate-400 text-xs">
+                  <div className="w-4 h-4 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
+                  <span>Redirecting to login page...</span>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => router.push('/auth/login')}
+                className="mt-4 bg-gradient-to-r from-red-500 via-orange-500 to-red-600 hover:from-red-400 hover:via-orange-400 hover:to-red-500 text-white font-semibold px-6 py-2 rounded-lg shadow-lg shadow-red-500/25 transition-all duration-300"
+              >
+                Go to Login Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Back Button - Fixed Position */}
       <Link 
         href="/"
@@ -237,7 +392,7 @@ export default function SignUpPage() {
       `}</style>
 
       <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-0 items-center relative z-10">
-        {/* Left Side - Animated Characters */}
+        {/* Left Side - Animated Characters (keep all existing characters) */}
         <div className="hidden lg:flex items-center justify-center bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl rounded-l-3xl border-l border-t border-b border-emerald-500/20 p-12 relative overflow-visible h-[700px]">
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-0 left-0 w-full h-full" style={{
