@@ -1,5 +1,37 @@
 [
   {
+    "id": "scan_1762141298129",
+    "userId": "user_123",
+    "brand": "Parle Agro",
+    "healthScore": 20,
+    "warnings": [
+      "Do not buy if the pack is puffed or leaking",
+      "Refrigerate after opening",
+      "Consume within 5 days"
+    ],
+    "scannedAt": "2025-11-03T03:41:38.129Z"
+  },
+  {
+    "id": "scan_1762131092389",
+    "userId": "user_123",
+    "brand": "Coca-Cola",
+    "healthScore": 12,
+    "warnings": [
+      "High sugar content",
+      "Contains caffeine",
+      "Excessive consumption may have adverse health effects"
+    ],
+    "scannedAt": "2025-11-03T00:51:32.389Z"
+  },
+  {
+    "id": "scan_1762088170253",
+    "userId": "user_123",
+    "brand": "Britannia",
+    "healthScore": 70,
+    "warnings": [],
+    "scannedAt": "2025-11-02T12:56:10.253Z"
+  },
+  {
     "id": "scan_1762087867590",
     "userId": "user_123",
     "brand": "Lay's",
