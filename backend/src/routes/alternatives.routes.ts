@@ -1,5 +1,5 @@
 import express from "express";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 
 const router = express.Router();
 
@@ -7,12 +7,6 @@ const router = express.Router();
 router.get("/test", (req, res) => {
   res.json({ message: "Alternatives route is working" });
 });
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!
-);
 
 // Get healthier alternatives
 router.get("/", async (req, res) => {

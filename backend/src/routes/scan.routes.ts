@@ -2,12 +2,11 @@
 import express from "express";
 import multer from "multer";
 import {scanController} from "../controllers/scan.controller";
-import { createClient } from "@supabase/supabase-js";
 import { getAlternatives } from "../controllers/scan.controller";
+import { supabase } from "../lib/supabase";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_KEY!);
 // ✅ Debug route to test connection
 router.get("/test", (req, res) => {
   res.json({ message: "Scan route active ✅" });
