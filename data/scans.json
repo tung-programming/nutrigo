@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< HEAD
     "id": "scan_1762141298129",
     "userId": "user_123",
     "brand": "Parle Agro",
@@ -30,6 +31,110 @@
     "healthScore": 70,
     "warnings": [],
     "scannedAt": "2025-11-02T12:56:10.253Z"
+=======
+    "id": "scan_1762107435081",
+    "userId": "user_123",
+    "brand": "KFC",
+    "healthScore": 25,
+    "warnings": "Nutrition facts (calories, fat, sugar, protein, carbs) per 100g are not visible in the image., Ingredients list is not visible in the image.",
+    "scannedAt": "2025-11-02T18:17:15.081Z"
+  },
+  {
+    "id": "scan_1762106992748",
+    "userId": "user_123",
+    "brand": "Coca-Cola",
+    "healthScore": 15,
+    "warnings": "High sugar content (based on product type)",
+    "scannedAt": "2025-11-02T18:09:52.748Z"
+  },
+  {
+    "id": "scan_1762106931503",
+    "userId": "user_123",
+    "brand": "Coca-Cola",
+    "healthScore": 15,
+    "warnings": "High sugar content, Contains caffeine",
+    "scannedAt": "2025-11-02T18:08:51.503Z"
+  },
+  {
+    "id": "scan_1762106409824",
+    "userId": "user_123",
+    "brand": "KFC",
+    "healthScore": 25,
+    "warnings": "",
+    "scannedAt": "2025-11-02T18:00:09.824Z"
+  },
+  {
+    "id": "scan_1762106221775",
+    "userId": "user_123",
+    "brand": "Unknown",
+    "healthScore": 25,
+    "warnings": "Information not visible on packaging, generic data used where possible.",
+    "scannedAt": "2025-11-02T17:57:01.775Z"
+  },
+  {
+    "id": "scan_1762106081237",
+    "userId": "user_123",
+    "brand": "Coca-Cola",
+    "healthScore": 15,
+    "warnings": "High sugar content, Contains caffeine",
+    "scannedAt": "2025-11-02T17:54:41.238Z"
+  },
+  {
+    "id": "scan_1762106057483",
+    "userId": "user_123",
+    "brand": "Fresh Produce",
+    "healthScore": 98,
+    "warnings": "",
+    "scannedAt": "2025-11-02T17:54:17.483Z"
+  },
+  {
+    "id": "scan_1762105758650",
+    "userId": "user_123",
+    "brand": "Generic",
+    "healthScore": 98,
+    "warnings": "",
+    "scannedAt": "2025-11-02T17:49:18.650Z"
+  },
+  {
+    "id": "scan_1762105673726",
+    "userId": "user_123",
+    "brand": "Fresh Produce",
+    "healthScore": 98,
+    "warnings": [],
+    "scannedAt": "2025-11-02T17:47:53.726Z"
+  },
+  {
+    "id": "scan_1762105191960",
+    "userId": "user_123",
+    "brand": "Coca-Cola",
+    "healthScore": 15,
+    "warnings": [
+      "High sugar content",
+      "Contains caffeine",
+      "Not recommended for children, pregnant women, or persons sensitive to caffeine",
+      "Excessive consumption may lead to dental erosion"
+    ],
+    "scannedAt": "2025-11-02T17:39:51.960Z"
+  },
+  {
+    "id": "scan_1762105141495",
+    "userId": "user_123",
+    "brand": "Generic",
+    "healthScore": 95,
+    "warnings": [],
+    "scannedAt": "2025-11-02T17:39:01.495Z"
+  },
+  {
+    "id": "scan_1762105111727",
+    "userId": "user_123",
+    "brand": "Coca-Cola",
+    "healthScore": 15,
+    "warnings": [
+      "High sugar content",
+      "Contains caffeine"
+    ],
+    "scannedAt": "2025-11-02T17:38:31.727Z"
+>>>>>>> ef8bcb84329c6e9d89d689bc1cea970dea83928e
   },
   {
     "id": "scan_1762087867590",

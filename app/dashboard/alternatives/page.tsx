@@ -38,7 +38,13 @@ export default function AlternativesPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p className="text-center text-slate-400 mt-12">Loading healthier alternatives...</p>
+  if (loading) {
+    return (
+      <div className="text-center mt-24">
+        <p className="text-slate-400 text-lg animate-pulse">Finding healthier alternatives...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="p-8 space-y-6">
@@ -54,11 +60,16 @@ export default function AlternativesPage() {
       ) : (
         <div className="grid md:grid-cols-3 gap-6">
           {alternatives.map((alt, i) => (
-            <Card key={i} className="p-6 bg-slate-900/80 border border-emerald-500/20">
+            <Card
+              key={i}
+              className="p-6 bg-slate-900/80 border border-emerald-500/20 hover:border-emerald-400/40 transition-all duration-300"
+            >
               <h2 className="text-xl font-bold text-white">{alt.name}</h2>
               <p className="text-slate-400">{alt.brand}</p>
-              <p className="mt-2 text-emerald-400 font-semibold">Health Score: {alt.health_score}</p>
-              <p className="text-slate-300 mt-1">Calories: {alt.nutrition?.calories || "N/A"} kcal</p>
+              <p className="mt-3 text-emerald-400 font-semibold">Health Score: {alt.health_score}</p>
+              <p className="text-slate-300 mt-1">
+                Calories: {alt.nutrition?.calories || "N/A"} kcal
+              </p>
             </Card>
           ))}
         </div>
