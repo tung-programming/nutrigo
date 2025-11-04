@@ -238,7 +238,7 @@ export default function SignUpPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/signup`,
+        redirectTo: `${window.location.origin}/auth/signup` || `${process.env.REDIRECT_URL}/auth/signup`,
         scopes: 'email profile',
         queryParams: {
           access_type: 'offline',
