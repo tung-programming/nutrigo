@@ -224,7 +224,7 @@ export default function ScannerPage() {
             {/* Camera Option */}
             <Card className="group relative p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 shadow-xl hover:shadow-emerald-500/20 cursor-pointer overflow-hidden">
               <button onClick={handleCameraStart} className="relative w-full h-full flex flex-col items-center justify-center space-y-6 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-24 h-24 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
                   <Camera size={40} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-black text-white">Use Camera</h3>
@@ -235,7 +235,7 @@ export default function ScannerPage() {
             {/* Upload Option */}
             <Card className="group relative p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300 shadow-xl hover:shadow-teal-500/20 cursor-pointer overflow-hidden">
               <button onClick={() => fileInputRef.current?.click()} className="relative w-full h-full flex flex-col items-center justify-center space-y-6 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-500/25 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-24 h-24 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-500/25 group-hover:scale-110 transition-transform duration-300">
                   <Upload size={40} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-black text-white">Upload Image</h3>
@@ -255,7 +255,8 @@ export default function ScannerPage() {
 
                   {/* Overlay Frame */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-64 h-80 border-4 border-emerald-400/50 rounded-2xl shadow-lg shadow-emerald-500/25"></div>
+                    {/* responsive overlay: use relative max sizes on small screens and a fixed frame on larger screens */}
+                    <div className="max-w-[70%] sm:w-64 max-h-[70%] sm:h-80 border-4 border-emerald-400/50 rounded-2xl shadow-lg shadow-emerald-500/25"></div>
                   </div>
 
                   {/* Loader */}

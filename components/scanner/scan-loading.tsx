@@ -18,7 +18,7 @@ export default function ScanLoading({ open, message = "Analyzing image...", subm
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 to-black/60 backdrop-blur-sm" />
 
-      <div className="relative w-full max-w-md rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-800/90 border border-emerald-500/20 shadow-2xl p-8 flex flex-col items-center text-center">
+      <div className="relative w-full max-w-[92%] sm:max-w-md rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-800/90 border border-emerald-500/20 shadow-2xl p-6 sm:p-8 flex flex-col items-center text-center">
         <div className="absolute -top-8 flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-400 shadow-lg">
           <Sparkles className="w-8 h-8 text-white animate-pulse" />
         </div>
