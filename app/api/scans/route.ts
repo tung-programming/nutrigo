@@ -1,46 +1,80 @@
-// Scans endpoint (mock implementation)
+import { type NextRequest, NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
-import { type NextRequest, NextResponse } from "next/server"
+// Define the path to the file where scans will be stored
+const dataFilePath = path.join(process.cwd(), "data", "scans.json");
 
+/**
+ * Reads the existing scan data from the JSON file.
+ */
+const readScansFromFile = () => {
+  try {
+    if (fs.existsSync(dataFilePath)) {
+      const fileContent = fs.readFileSync(dataFilePath, "utf8");
+      return fileContent ? JSON.parse(fileContent) : [];
+    }
+  } catch (error) {
+    console.error("Error reading from scans data file:", error);
+  }
+  return [];
+};
+
+/**
+ * Writes the provided scan data to the JSON file.
+ */
+const writeScansToFile = (data: any[]) => {
+  try {
+    const dir = path.dirname(dataFilePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error("Error writing to scans data file:", error);
+  }
+};
+
+/**
+ * Handles GET requests to fetch the entire scan history.
+ */
 export async function GET() {
-  // Mock scan history
-  return NextResponse.json({
-    success: true,
-    data: [
-      {
-        id: "scan_1",
-        userId: "user_123",
-        productName: "Coca Cola",
-        brand: "The Coca-Cola Company",
-        healthScore: 25,
-        calories: 140,
-        sugar: 39,
-        protein: 0,
-        fat: 0,
-        carbs: 39,
-        ingredients: ["Carbonated Water", "High Fructose Corn Syrup", "Caramel Color"],
-        warnings: ["High Sugar Content", "Contains Caffeine"],
-        scannedAt: new Date().toISOString(),
-      },
-    ],
-  })
+  const scans = readScansFromFile();
+  return NextResponse.json({ success: true, data: scans });
 }
 
+/**
+ * Handles POST requests to add a new scan to the history.
+ */
 export async function POST(request: NextRequest) {
   try {
-    const scanData = await request.json()
+    const scanData = await request.json();
+    const allScans = readScansFromFile();
 
-    // Mock scan creation
-    return NextResponse.json({
-      success: true,
-      data: {
-        id: "scan_" + Math.random().toString(36).substr(2, 9),
-        userId: "user_123",
-        ...scanData,
-        scannedAt: new Date().toISOString(),
-      },
-    })
+    // Ensure arrays are properly formatted for PostgreSQL
+    const formatArray = (arr: any[] | undefined | null) => {
+      return Array.isArray(arr) ? arr : [];
+    };
+
+    const newScan = {
+      id: `scan_${Date.now()}`,
+      userId: "user_123", // In a real app, this would be dynamic
+      ...scanData,
+      ingredients: formatArray(scanData.ingredients),
+      warnings: formatArray(scanData.warnings),
+      scannedAt: new Date().toISOString(),
+    };
+
+    // Add the new scan to the beginning of the array
+    allScans.unshift(newScan);
+    writeScansToFile(allScans);
+
+    return NextResponse.json({ success: true, data: newScan }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ success: false, error: "Failed to create scan" }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : "An unknown error";
+    return NextResponse.json(
+      { success: false, error: `Failed to create scan: ${errorMessage}` },
+      { status: 500 }
+    );
   }
 }

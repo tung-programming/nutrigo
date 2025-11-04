@@ -1,0 +1,53 @@
+[
+  {
+    "id": "scan_1762276709351",
+    "userId": "user_123",
+    "brand": "Coca-Cola",
+    "healthScore": 15,
+    "ingredients": [],
+    "warnings": [],
+    "scannedAt": "2025-11-04T17:18:29.351Z"
+  },
+  {
+    "id": "scan_1762271997272",
+    "userId": "user_123",
+    "brand": "Generic",
+    "healthScore": 88,
+    "ingredients": [],
+    "warnings": [],
+    "scannedAt": "2025-11-04T15:59:57.272Z"
+  },
+  {
+    "id": "scan_1762271749898",
+    "userId": "user_123",
+    "brand": "Lotte",
+    "healthScore": 20,
+    "ingredients": [],
+    "warnings": [],
+    "scannedAt": "2025-11-04T15:55:49.898Z"
+  },
+  {
+    "id": "scan_1762271177725",
+    "userId": "user_123",
+    "brand": "OREO",
+    "healthScore": 12,
+    "warnings": "",
+    "scannedAt": "2025-11-04T15:46:17.725Z"
+  },
+  {
+    "id": "scan_1762270659358",
+    "userId": "user_123",
+    "brand": "Britannia",
+    "healthScore": 70,
+    "warnings": "",
+    "scannedAt": "2025-11-04T15:37:39.358Z"
+  },
+  {
+    "id": "scan_1762173715781",
+    "userId": "user_123",
+    "brand": "Parle Agro",
+    "healthScore": 25,
+    "warnings": "High sugar content",
+    "scannedAt": "2025-11-03T12:41:55.781Z"
+  }
+]

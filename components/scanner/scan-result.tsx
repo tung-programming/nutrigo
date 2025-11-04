@@ -159,16 +159,31 @@ export default function ScanResult({ data, onReset }: ScanResultProps) {
               <h3 className="text-xl font-black text-white">Health Warnings</h3>
             </div>
             <div className="space-y-3">
-              {data.warnings.map((warning, index) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30"
-                >
-                  <AlertCircle size={18} className="text-red-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-red-300 leading-relaxed">{warning}</span>
-                </div>
-              ))}
-            </div>
+            {Array.isArray(data.warnings)
+              ? data.warnings.map((warning: string, index: number) => (
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30"
+                  >
+                    <span className="text-red-400 font-semibold">{warning}</span>
+                  </div>
+                ))
+              : typeof data.warnings === "string"
+              ? (data.warnings as string)
+                  .split(",")
+                  .map((warning: string, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30"
+                    >
+                      <span className="text-red-400 font-semibold">
+                        {warning.trim()}
+                      </span>
+                    </div>
+                  ))
+              : null}
+          </div>
+
           </Card>
         </div>
 

@@ -36,6 +36,32 @@ export interface HealthMetrics {
   currentStreak: number
 }
 
+// Helper: parse response safely and provide clear errors when HTML or non-JSON is returned
+async function parseJsonSafely<T>(response: Response): Promise<T> {
+  const text = await response.text()
+  const contentType = response.headers.get("content-type") || ""
+
+  // If response isn't JSON, throw with snippet so we can see HTML bodies in logs
+  if (!contentType.includes("application/json")) {
+    const snippet = text.slice(0, 500)
+    throw new Error(`Expected JSON response but got '${contentType || "no content-type"}'. Body starts: ${snippet}`)
+  }
+
+  // Try parse
+  try {
+    const parsed = JSON.parse(text) as T
+    if (!response.ok) {
+      // If backend included an error field, surface it
+      const errMsg = (parsed as any)?.error || (parsed as any)?.message || `HTTP ${response.status}`
+      throw new Error(errMsg)
+    }
+    return parsed
+  } catch (err) {
+    // If JSON.parse fails, include body snippet for debugging
+    const snippet = text.slice(0, 500)
+    throw new Error(`Failed to parse JSON response. Body starts: ${snippet}`)
+  }
+}
 // Auth endpoints
 export async function signUp(email: string, password: string, name: string): Promise<ApiResponse<User>> {
   try {
@@ -44,7 +70,7 @@ export async function signUp(email: string, password: string, name: string): Pro
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, name }),
     })
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<User>>(response)
   } catch (error) {
     return { success: false, error: "Failed to sign up" }
   }
@@ -57,7 +83,7 @@ export async function login(email: string, password: string): Promise<ApiRespons
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     })
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<User>>(response)
   } catch (error) {
     return { success: false, error: "Failed to login" }
   }
@@ -66,7 +92,7 @@ export async function login(email: string, password: string): Promise<ApiRespons
 export async function logout(): Promise<ApiResponse<null>> {
   try {
     const response = await fetch("/api/auth/logout", { method: "POST" })
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<null>>(response)
   } catch (error) {
     return { success: false, error: "Failed to logout" }
   }
@@ -82,7 +108,7 @@ export async function createScan(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(scanData),
     })
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<ScanRecord>>(response)
   } catch (error) {
     return { success: false, error: "Failed to create scan" }
   }
@@ -91,7 +117,7 @@ export async function createScan(
 export async function getScanHistory(): Promise<ApiResponse<ScanRecord[]>> {
   try {
     const response = await fetch("/api/scans")
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<ScanRecord[]>>(response)
   } catch (error) {
     return { success: false, error: "Failed to fetch scan history" }
   }
@@ -100,7 +126,7 @@ export async function getScanHistory(): Promise<ApiResponse<ScanRecord[]>> {
 export async function deleteScan(scanId: string): Promise<ApiResponse<null>> {
   try {
     const response = await fetch(`/api/scans/${scanId}`, { method: "DELETE" })
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<null>>(response)
   } catch (error) {
     return { success: false, error: "Failed to delete scan" }
   }
@@ -110,7 +136,7 @@ export async function deleteScan(scanId: string): Promise<ApiResponse<null>> {
 export async function getHealthMetrics(): Promise<ApiResponse<HealthMetrics>> {
   try {
     const response = await fetch("/api/metrics")
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<HealthMetrics>>(response)
   } catch (error) {
     return { success: false, error: "Failed to fetch metrics" }
   }
@@ -124,7 +150,7 @@ export async function updateProfile(data: Partial<User>): Promise<ApiResponse<Us
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<User>>(response)
   } catch (error) {
     return { success: false, error: "Failed to update profile" }
   }
@@ -133,7 +159,7 @@ export async function updateProfile(data: Partial<User>): Promise<ApiResponse<Us
 export async function getProfile(): Promise<ApiResponse<User>> {
   try {
     const response = await fetch("/api/user/profile")
-    return await response.json()
+    return await parseJsonSafely<ApiResponse<User>>(response)
   } catch (error) {
     return { success: false, error: "Failed to fetch profile" }
   }

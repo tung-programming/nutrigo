@@ -234,18 +234,22 @@ export default function SignUpPage() {
     setIsLoading(true)
     setError("")
     setSuccess("")
+    const redirectUrl =
+    process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/signup`
+      : `${window.location.origin}/auth/signup`;
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/signup`,
+        redirectTo: redirectUrl,
         scopes: 'email profile',
         queryParams: {
           access_type: 'offline',
           prompt: 'select_account',
         },
       },
-    })
+    });
 
     if (error) {
       setError(error.message)

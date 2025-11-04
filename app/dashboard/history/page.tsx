@@ -13,101 +13,73 @@ import {
   BarChart3,
   Sparkles,
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
+// Interface to match the data structure from your API
 interface ScanHistory {
-  id: number
+  id: string
   name: string
   brand: string
   score: number
   category: string
-  date: string
+  date: string // This will be the ISO string 'scannedAt' from your API
   calories: number
   sugar: number
 }
 
-const mockHistory: ScanHistory[] = [
-  // ... (your mockHistory data remains the same)
-  {
-    id: 1,
-    name: "Coca Cola",
-    brand: "The Coca-Cola Company",
-    score: 25,
-    category: "Beverage",
-    date: "Today",
-    calories: 140,
-    sugar: 39,
-  },
-  {
-    id: 2,
-    name: "Almond Milk",
-    brand: "Silk",
-    score: 85,
-    category: "Beverage",
-    date: "Yesterday",
-    calories: 30,
-    sugar: 0,
-  },
-  {
-    id: 3,
-    name: "Granola Bar",
-    brand: "Nature Valley",
-    score: 45,
-    category: "Snack",
-    date: "2 days ago",
-    calories: 190,
-    sugar: 12,
-  },
-  {
-    id: 4,
-    name: "Orange Juice",
-    brand: "Tropicana",
-    score: 65,
-    category: "Beverage",
-    date: "3 days ago",
-    calories: 110,
-    sugar: 26,
-  },
-  {
-    id: 5,
-    name: "Greek Yogurt",
-    brand: "Fage",
-    score: 88,
-    category: "Dairy",
-    date: "4 days ago",
-    calories: 100,
-    sugar: 7,
-  },
-  {
-    id: 6,
-    name: "Potato Chips",
-    brand: "Lay's",
-    score: 35,
-    category: "Snack",
-    date: "5 days ago",
-    calories: 160,
-    sugar: 1,
-  },
-]
-
-// UPDATED: Simplified the SortKey type
 type SortKey = "date" | "score" | "calories" | "sugar"
 
 export default function HistoryPage() {
+  // States to manage data, loading, and filters
+  const [history, setHistory] = useState<ScanHistory[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCategory, setFilterCategory] = useState<string | null>(null)
-  // UPDATED: Use the new SortKey type
   const [sortBy, setSortBy] = useState<SortKey>("date")
 
-  const filteredHistory = mockHistory
+  // Fetch data from the API when the component loads
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setLoading(true)
+      try {
+        const response = await fetch("/api/scans")
+        if (!response.ok) {
+          throw new Error("Failed to fetch scan history")
+        }
+        const apiResponse = await response.json()
+
+        if (apiResponse.success) {
+          // Map the API data to the structure used by this component
+          const mappedData: ScanHistory[] = apiResponse.data.map((item: any) => ({
+            id: item.id,
+            name: item.productName,
+            brand: item.brand,
+            score: item.healthScore,
+            category: item.category || "General", // Use a fallback category
+            date: item.scannedAt,
+            calories: item.calories,
+            sugar: item.sugar,
+          }));
+          setHistory(mappedData)
+        }
+      } catch (error) {
+        console.error("Error fetching history:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchHistory()
+  }, []) // The empty array ensures this runs only once on mount
+
+  // Filter and sort the fetched history data
+  const filteredHistory = history
     .filter((item) => {
-      const matchesSearch = item.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
+      // ✅ FIX: Provide a fallback empty string for item.name to prevent crash
+      const matchesSearch = (item.name || "").toLowerCase().includes(searchTerm.toLowerCase())
       const matchesCategory = !filterCategory || item.category === filterCategory
       return matchesSearch && matchesCategory
     })
-    // UPDATED: Simplified sort logic
     .sort((a, b) => {
       switch (sortBy) {
         case "score":
@@ -115,17 +87,19 @@ export default function HistoryPage() {
         case "calories":
           return b.calories - a.calories
         case "sugar":
-          return b.sugar - b.sugar
+          return b.sugar - a.sugar
         case "date":
         default:
-          // Sort by ID as a proxy for "newest"
-          return b.id - a.id
+          return new Date(b.date).getTime() - new Date(a.date).getTime()
       }
     })
 
-  const categories = Array.from(
-    new Set(mockHistory.map((item) => item.category))
-  )
+  // Derive categories and stats from the real data
+  const categories = Array.from(new Set(history.map((item) => item.category)))
+  const totalScans = history.length
+  const averageScore = totalScans > 0 ? Math.round(history.reduce((sum, item) => sum + item.score, 0) / totalScans) : 0
+  const healthyChoices = history.filter((item) => item.score >= 70).length
+  const successRate = totalScans > 0 ? Math.round((healthyChoices / totalScans) * 100) : 0
 
   const getScoreColor = (score: number) => {
     if (score >= 70) return "text-emerald-400"
@@ -158,12 +132,8 @@ export default function HistoryPage() {
               <BarChart3 size={28} className="text-white" />
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-black text-white">
-                Scan History
-              </h1>
-              <p className="text-slate-400 text-lg">
-                View all your previous food scans and nutrition analysis
-              </p>
+              <h1 className="text-4xl md:text-5xl font-black text-white">Scan History</h1>
+              <p className="text-slate-400 text-lg">View all your previous food scans and nutrition analysis</p>
             </div>
           </div>
         </div>
@@ -172,10 +142,7 @@ export default function HistoryPage() {
         <Card className="p-6 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 shadow-xl space-y-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search
-                className="absolute left-4 top-4 text-slate-500"
-                size={20}
-              />
+              <Search className="absolute left-4 top-4 text-slate-500" size={20} />
               <Input
                 placeholder="Search by product name..."
                 value={searchTerm}
@@ -183,14 +150,9 @@ export default function HistoryPage() {
                 className="pl-12 h-14 bg-slate-800/50 border-slate-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-white placeholder:text-slate-500 rounded-xl text-base"
               />
             </div>
-
             <div className="flex gap-3">
               <div className="relative">
-                <Filter
-                  className="absolute left-3 top-4 text-slate-500"
-                  size={18}
-                />
-                {/* UPDATED: Simplified select dropdown */}
+                <Filter className="absolute left-3 top-4 text-slate-500" size={18} />
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortKey)}
@@ -234,9 +196,12 @@ export default function HistoryPage() {
         </Card>
 
         {/* History List */}
-        {/* ... (The rest of your component remains the same) ... */}
         <div className="space-y-4">
-          {filteredHistory.length > 0 ? (
+          {loading ? (
+            <Card className="p-16 flex justify-center items-center bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700">
+              <p className="text-slate-400 text-lg">Loading History...</p>
+            </Card>
+          ) : filteredHistory.length > 0 ? (
             filteredHistory.map((item) => (
               <Card
                 key={item.id}
@@ -245,39 +210,29 @@ export default function HistoryPage() {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="font-bold text-white text-lg">
-                        {item.name}
-                      </h3>
+                      <h3 className="font-bold text-white text-lg">{item.brand || 'Unnamed Product'}</h3>
                       <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-semibold">
                         {item.category}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-400">{item.brand}</p>
                     <div className="flex flex-wrap gap-4 text-sm text-slate-500 pt-2">
                       <span className="flex items-center gap-2">
                         <Calendar size={16} className="text-emerald-400" />
-                        <span className="text-slate-300">{item.date}</span>
+                        <span className="text-slate-300">{new Date(item.date).toLocaleDateString()}</span>
                       </span>
                       <span className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        <span className="text-slate-300">
-                          {item.calories} cal
-                        </span>
+                        <span className="text-slate-300">{item.calories} cal</span>
                       </span>
                       <span className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
-                        <span className="text-slate-300">
-                          {item.sugar}g sugar
-                        </span>
+                        <span className="text-slate-300">{item.sugar}g sugar</span>
                       </span>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-4">
                     <div
-                      className={`px-6 py-3 rounded-xl font-black text-2xl ${getScoreBg(
-                        item.score
-                      )} ${getScoreColor(item.score)} shadow-lg`}
+                      className={`px-6 py-3 rounded-xl font-black text-2xl ${getScoreBg(item.score)} ${getScoreColor(item.score)} shadow-lg`}
                     >
                       {item.score}
                     </div>
@@ -293,14 +248,12 @@ export default function HistoryPage() {
               </Card>
             ))
           ) : (
-            <Card className="p-16 bg-gradient-to-br from-slate-900/90 to-slate-800/9OS backdrop-blur-xl border border-slate-700 text-center">
+            <Card className="p-16 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700 text-center">
               <div className="space-y-4">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto">
                   <Sparkles size={40} className="text-emerald-400" />
                 </div>
-                <p className="text-slate-400 text-lg">
-                  No scans found. Start scanning to build your history!
-                </p>
+                <p className="text-slate-400 text-lg">No scans found. Start scanning to build your history!</p>
               </div>
             </Card>
           )}
@@ -311,73 +264,48 @@ export default function HistoryPage() {
           <Card className="group p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/40 shadow-xl transition-all duration-300">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-slate-400">
-                  Total Scans
-                </span>
+                <span className="text-sm font-semibold text-slate-400">Total Scans</span>
                 <div className="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <BarChart3 size={20} className="text-emerald-400" />
                 </div>
               </div>
-              <p className="text-4xl font-black text-white">
-                {mockHistory.length}
-              </p>
+              <p className="text-4xl font-black text-white">{totalScans}</p>
               <div className="flex items-center gap-2 text-emerald-400 text-sm">
                 <TrendingUp size={16} />
                 <span>All time</span>
               </div>
             </div>
           </Card>
-
           <Card className="group p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-teal-500/20 hover:border-teal-500/40 shadow-xl transition-all duration-300">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-slate-400">
-                  Average Score
-                </span>
+                <span className="text-sm font-semibold text-slate-400">Average Score</span>
                 <div className="w-10 h-10 rounded-lg bg-teal-500/20 border border-teal-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <TrendingUp size={20} className="text-teal-400" />
                 </div>
               </div>
-              <p className="text-4xl font-black text-white">
-                {Math.round(
-                  mockHistory.reduce((sum, item) => sum + item.score, 0) /
-                    mockHistory.length
-                )}
-              </p>
+              <p className="text-4xl font-black text-white">{averageScore}</p>
               <div className="flex items-center gap-2 text-teal-400 text-sm">
                 <Award size={16} />
                 <span>Great progress!</span>
               </div>
             </div>
           </Card>
-
           <Card className="group p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-cyan-500/20 hover:border-cyan-500/40 shadow-xl transition-all duration-300">
-  <div className="space-y-4">
-    <div className="flex items-center justify-between">
-      <span className="text-sm font-semibold text-slate-400">
-        Healthy Choices
-      </span>
-      <div className="w-10 h-10 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-        <Award size={20} className="text-cyan-400" />
-      </div>
-    </div>
-    <p className="text-4xl font-black text-white">
-      {mockHistory.filter((item) => item.score >= 70).length}
-    </p>
-    {/* THIS IS THE CORRECTED LINE */}
-    <div className="flex items-center gap-2 text-cyan-400 text-sm">
-      <Sparkles size={16} />
-      <span>
-        {Math.round(
-          (mockHistory.filter((item) => item.score >= 70).length /
-            mockHistory.length) *
-            100
-        )}
-        % success rate
-      </span>
-    </div>
-  </div>
-</Card>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-slate-400">Healthy Choices</span>
+                <div className="w-10 h-10 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Award size={20} className="text-cyan-400" />
+                </div>
+              </div>
+              <p className="text-4xl font-black text-white">{healthyChoices}</p>
+              <div className="flex items-center gap-2 text-cyan-400 text-sm">
+                <Sparkles size={16} />
+                <span>{successRate}% success rate</span>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
     </div>

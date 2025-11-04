@@ -41,8 +41,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-xl border-b border-emerald-500/20 flex items-center justify-between px-4 h-16 shadow-xl">
-        <Link href="/" className="flex items-center gap-3">
+        <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-xl border-b border-emerald-500/20 flex items-center justify-between px-4 h-16 shadow-xl">
+        <Link href="/" className="flex items-center gap-3" aria-label="NutriGo home">
           <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-lg">
             <Image
               src="/logo.png"
@@ -52,7 +52,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               priority
             />
           </div>
-          <span className="font-black text-white text-lg">NutriGo</span>
         </Link>
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
