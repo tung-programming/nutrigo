@@ -51,10 +51,17 @@ export async function POST(request: NextRequest) {
     const scanData = await request.json();
     const allScans = readScansFromFile();
 
+    // Ensure arrays are properly formatted for PostgreSQL
+    const formatArray = (arr: any[] | undefined | null) => {
+      return Array.isArray(arr) ? arr : [];
+    };
+
     const newScan = {
       id: `scan_${Date.now()}`,
       userId: "user_123", // In a real app, this would be dynamic
       ...scanData,
+      ingredients: formatArray(scanData.ingredients),
+      warnings: formatArray(scanData.warnings),
       scannedAt: new Date().toISOString(),
     };
 
