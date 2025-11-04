@@ -285,7 +285,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <h1 className="text-4xl md:text-5xl font-black text-white">
-                Welcome back, <span className="bg-linear-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">{userName}
+                Welcome back, <span className="bg-linear-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
                   {userName}
                 </span>!
               </h1>

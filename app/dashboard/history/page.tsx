@@ -210,12 +210,11 @@ export default function HistoryPage() {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="font-bold text-white text-lg">{item.name || 'Unnamed Product'}</h3>
+                      <h3 className="font-bold text-white text-lg">{item.brand || 'Unnamed Product'}</h3>
                       <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-semibold">
                         {item.category}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-400">{item.brand}</p>
                     <div className="flex flex-wrap gap-4 text-sm text-slate-500 pt-2">
                       <span className="flex items-center gap-2">
                         <Calendar size={16} className="text-emerald-400" />

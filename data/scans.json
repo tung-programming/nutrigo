@@ -1,5 +1,14 @@
 [
   {
+    "id": "scan_1762276709351",
+    "userId": "user_123",
+    "brand": "Coca-Cola",
+    "healthScore": 15,
+    "ingredients": [],
+    "warnings": [],
+    "scannedAt": "2025-11-04T17:18:29.351Z"
+  },
+  {
     "id": "scan_1762271997272",
     "userId": "user_123",
     "brand": "Generic",

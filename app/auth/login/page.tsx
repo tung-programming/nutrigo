@@ -66,6 +66,33 @@ export default function LoginPage() {
       authListener.subscription.unsubscribe()
     }
   }, [router, supabase])
+  // ✅ This guarantees redirect after Google login (and works locally + in prod)
+useEffect(() => {
+  const handleSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    console.log("Session check:", session)
+
+    // If user already logged in → dashboard
+    if (session) {
+      router.replace("/dashboard")
+      return
+    }
+
+    // Listen for sign-in events (email or Google)
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        router.replace("/dashboard")
+      }
+    })
+
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }
+
+  handleSession()
+}, [router, supabase])
+
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -162,27 +189,33 @@ export default function LoginPage() {
 
   // ✅ Google Sign-In
   const handleGoogleSignIn = async () => {
-    setIsLoading(true)
-    setError("")
-    setSuccess("")
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/login` || `${process.env.REDIRECT_URL}/auth/login`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'select_account',
-        },
-      }
-    })
-
-    if (error) {
-      setError("Could not log in with Google. Please try again.")
-      setIsLoading(false)
+  setIsLoading(true)
+  setError("")
+  setSuccess("")
+  
+  // ✅ CRITICAL FIX: Redirect to a dedicated callback route
+  const redirectUrl =
+    process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      : `${window.location.origin}/auth/callback`
+  
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'select_account',
+      },
     }
-    // On success, Supabase handles the redirect and onAuthStateChange will show popup
+  })
+
+  if (error) {
+    setError("Could not log in with Google. Please try again.")
+    setIsLoading(false)
   }
+}
+
 
   const calculateEyePosition = (centerX: number, centerY: number) => {
     if (isPasswordFocused) return { x: 0, y: 0 }
