@@ -4,7 +4,18 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Leaf, Sparkles, Apple, Coffee, Cookie, Milk, Wheat, Fish } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { healthyAlternatives } from "@/lib/mockAlternatives"
+
 
 interface Alternative {
   name: string
@@ -16,13 +27,16 @@ interface Alternative {
   }
   benefits: string[]
   description: string
+  purchaseLink?: string
 }
+
 
 export default function AlternativesPage() {
   const [currentCategory, setCurrentCategory] = useState("snacks")
   const [alternatives, setAlternatives] = useState<Alternative[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
 
   useEffect(() => {
     try {
@@ -37,6 +51,7 @@ export default function AlternativesPage() {
     }
   }, [currentCategory])
 
+
   const CategoryIcon = {
     snacks: Apple,
     beverages: Coffee,
@@ -45,6 +60,7 @@ export default function AlternativesPage() {
     grains: Wheat,
     proteins: Fish,
   }
+
 
   if (loading) {
     return (
@@ -59,12 +75,13 @@ export default function AlternativesPage() {
     )
   }
 
+
   return (
     <div className="min-h-screen bg-slate-950 p-4 md:p-8 lg:p-12 space-y-8">
       {/* Header */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-xl bg-linear-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center shadow-xl shadow-emerald-500/25">
+          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center shadow-xl shadow-emerald-500/25">
             <Leaf className="w-8 h-8 text-white" />
           </div>
           <div>
@@ -73,6 +90,7 @@ export default function AlternativesPage() {
           </div>
         </div>
       </div>
+
 
       {error ? (
         <div className="text-red-400 text-lg p-6 bg-red-500/10 rounded-xl border border-red-500/20">
@@ -97,19 +115,20 @@ export default function AlternativesPage() {
             })}
           </TabsList>
 
+
           {Object.keys(healthyAlternatives).map((category) => (
             <TabsContent key={category} value={category}>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {alternatives.map((alt, i) => (
                   <Card
                     key={i}
-                    className="group relative p-6 bg-linear-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 shadow-xl overflow-hidden"
+                    className="group relative p-6 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 shadow-xl overflow-hidden"
                   >
-                    <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div className="relative space-y-4">
                       <div className="flex items-center justify-between">
                         <h2 className="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">{alt.name}</h2>
-                        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
                           <span className="text-xl font-black text-emerald-400">{alt.health_score}</span>
                         </div>
                       </div>
@@ -118,6 +137,7 @@ export default function AlternativesPage() {
                         <p className="text-slate-400">{alt.brand}</p>
                         <p className="text-sm text-slate-500 mt-1">{alt.description}</p>
                       </div>
+
 
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
@@ -138,6 +158,7 @@ export default function AlternativesPage() {
                           ))}
                       </div>
 
+
                       <div className="flex flex-wrap gap-2">
                         {alt.benefits.map((benefit, idx) => (
                           <span
@@ -147,6 +168,130 @@ export default function AlternativesPage() {
                             {benefit}
                           </span>
                         ))}
+                      </div>
+
+
+                      {/* Actions: learn more / buy if available */}
+                      <div className="pt-4 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {/* Learn dialog trigger */}
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                className="text-slate-300 hover:text-emerald-400 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/30 transition-all duration-300"
+                              >
+                                Learn
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-slate-900/95 backdrop-blur-xl border border-emerald-500/20">
+                              <DialogHeader>
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <DialogTitle className="text-2xl font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+                                      {alt.name}
+                                    </DialogTitle>
+                                    <DialogDescription className="text-slate-400">
+                                      {alt.brand}
+                                    </DialogDescription>
+                                  </div>
+                                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
+                                    <span className="text-2xl font-black text-emerald-400">{alt.health_score}</span>
+                                  </div>
+                                </div>
+                              </DialogHeader>
+                              <div className="space-y-4 pt-2">
+                                <p className="text-sm text-slate-400">{alt.description}</p>
+
+                                <div>
+                                  <h4 className="text-sm font-semibold text-white">Nutrition</h4>
+                                  <div className="mt-2 text-sm text-slate-300">
+                                    {Object.entries(alt.nutrition).map(([k, v]) => (
+                                      <div key={k} className="flex justify-between">
+                                        <span className="capitalize">{k}</span>
+                                        <span className="font-semibold text-emerald-400">{String(v)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <h4 className="text-sm font-semibold text-white">Benefits</h4>
+                                  <div className="mt-2 flex flex-wrap gap-2">
+                                    {alt.benefits.map((b, idx) => (
+                                      <span key={idx} className="px-2 py-1 text-xs rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                                        {b}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <h4 className="text-sm font-semibold text-white">When to Choose This</h4>
+                                  <p className="mt-2 text-sm text-slate-400">
+                                    {alt.name} is a great choice when you want a nutritious option that's {alt.benefits.join(", ").toLowerCase()}.
+                                    With {alt.nutrition.calories} calories per serving, it provides balanced nutrition without compromising on taste.
+                                  </p>
+                                </div>
+
+                                <div>
+                                  <h4 className="text-sm font-semibold text-white">Health Impact</h4>
+                                  <p className="mt-2 text-sm text-slate-400">
+                                    This alternative has earned a health score of {alt.health_score} thanks to its nutritional profile and benefits.
+                                    {alt.health_score >= 90 ? " It's among our top-rated healthy options!" : 
+                                      alt.health_score >= 80 ? " It's a very healthy choice for regular consumption." :
+                                      " While not our highest-rated option, it's still a healthier alternative to conventional choices."}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button 
+                                    variant="outline"
+                                    className="border-slate-700 hover:border-emerald-500/50 bg-slate-800/50 hover:bg-emerald-500/10 text-slate-300 hover:text-emerald-400 transition-all duration-300"
+                                  >
+                                    Close
+                                  </Button>
+                                </DialogClose>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+
+                          {/* Buy dialog trigger (coming soon) */}
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-lg shadow-emerald-500/25 transition-all duration-300">
+                                Buy
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-slate-900/95 backdrop-blur-xl border border-emerald-500/20">
+                              <DialogHeader>
+                                <DialogTitle className="text-2xl font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+                                  Buy — Coming Soon
+                                </DialogTitle>
+                                <DialogDescription className="text-slate-400">
+                                  Purchase integration is not available yet.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="pt-4">
+                                <p className="text-slate-300">
+                                  We're working on adding in-app purchases for {alt.name}. Stay tuned!
+                                </p>
+                              </div>
+                              <DialogFooter className="mt-6">
+                                <DialogClose asChild>
+                                  <Button 
+                                    variant="outline" 
+                                    className="w-full border-slate-700 hover:border-emerald-500/50 bg-slate-800/50 hover:bg-emerald-500/10 text-slate-300 hover:text-emerald-400 transition-all duration-300"
+                                  >
+                                    Close
+                                  </Button>
+                                </DialogClose>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                       </div>
                     </div>
                   </Card>
