@@ -5,16 +5,18 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User, Mail, Phone, MapPin, Save, Edit2, Bell, Moon, FileText, Sparkles } from "lucide-react"
+import { User, Mail, Phone, MapPin, Save, Edit2, Bell, Moon, FileText, Sparkles, Crown, ArrowRight } from "lucide-react"
 import { useState, useEffect } from "react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { toast } from "sonner"
+import Link from "next/link"
 
 export default function ProfilePage() {
   const supabase = createClientComponentClient()
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [currentPlan, setCurrentPlan] = useState("nutrigo") // nutrigo, nutriplus, or nutripro
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,6 +58,9 @@ export default function ProfilePage() {
             location: profile?.location || userMetadata.location || '',
             bio: profile?.bio || userMetadata.bio || '',
           })
+          
+          // Get user's current plan
+          setCurrentPlan(profile?.subscription_plan || userMetadata.subscription_plan || 'nutrigo')
         }
       } catch (err) {
         console.error('Error:', err)
@@ -108,6 +113,14 @@ export default function ProfilePage() {
       setIsSaving(false)
     }
   }
+
+  const plans = {
+    nutrigo: { name: 'NutriGo', icon: '🌱', price: 'Free' },
+    nutriplus: { name: 'NutriPlus', icon: '🍊', price: '₹249/month' },
+    nutripro: { name: 'NutriPro', icon: '🏆', price: '₹499/month' }
+  }
+
+  const currentPlanDetails = plans[currentPlan as keyof typeof plans] || plans.nutrigo
 
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
@@ -348,6 +361,42 @@ export default function ProfilePage() {
             ))}
           </div>
         </Card>
+
+        {/* Compact Subscription Section - At Bottom */}
+        {currentPlan !== 'nutripro' && (
+          <Card className="p-6 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 backdrop-blur-xl border border-amber-500/30 shadow-xl">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
+                  <Crown size={24} className="text-white" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg font-black text-white">Current Plan:</span>
+                    <span className="text-lg font-black text-amber-400">{currentPlanDetails.icon} {currentPlanDetails.name}</span>
+                  </div>
+                  <p className="text-sm text-slate-400">Upgrade to unlock unlimited scans and advanced features</p>
+                </div>
+              </div>
+              <Link href="/pricing">
+                <Button className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-400 hover:via-orange-400 hover:to-red-400 text-white font-bold px-6 py-3 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 border-0 whitespace-nowrap">
+                  Upgrade Now
+                  <ArrowRight size={18} className="ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </Card>
+        )}
+
+        {/* Already on Premium Plan */}
+        {currentPlan === 'nutripro' && (
+          <Card className="p-6 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 backdrop-blur-xl border border-emerald-500/30 shadow-xl">
+            <div className="flex items-center justify-center gap-3">
+              <Sparkles size={24} className="text-emerald-400" />
+              <p className="text-lg font-bold text-emerald-400">You're on the best plan! 🎉</p>
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   )
