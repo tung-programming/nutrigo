@@ -12,6 +12,8 @@ export const healthyAlternatives = {
       },
       benefits: ["High in protein", "Probiotics", "Antioxidants"],
       description: "Natural yogurt with fresh mixed berries"
+      ,
+      purchaseLink: "https://example.com/greek-yogurt-berries"
     },
     {
       name: "Mixed Nuts Trail Mix",
@@ -24,6 +26,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Healthy fats", "Protein", "Minerals"],
       description: "Almonds, walnuts, and pumpkin seeds mix"
+      ,
+      purchaseLink: "https://example.com/mixed-nuts-trail-mix"
     },
     {
       name: "Hummus with Carrot Sticks",
@@ -36,6 +40,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Plant protein", "Fiber", "Vitamins"],
       description: "Fresh hummus with organic carrots"
+      ,
+      purchaseLink: "https://example.com/hummus-carrot-sticks"
     }
   ],
   beverages: [
@@ -75,6 +81,43 @@ export const healthyAlternatives = {
       benefits: ["Real fruit", "No added sugar", "Rich in vitamins"],
       description: "Mixed berries with almond milk"
     }
+    ,
+    {
+      name: "Cold-Pressed Apple Juice",
+      brand: "Pressed Goodness",
+      health_score: 78,
+      nutrition: {
+        calories: 90,
+        sugar: 12,
+      },
+      benefits: ["No added sugar", "Cold-pressed", "Rich in phytonutrients"],
+      description: "Fresh cold-pressed apple juice with no preservatives",
+      purchaseLink: "https://example.com/pressed-apple-juice"
+    },
+    {
+      name: "Beet & Berry Vitality",
+      brand: "Vital Sips",
+      health_score: 74,
+      nutrition: {
+        calories: 95,
+        sugar: 9,
+      },
+      benefits: ["Detox support", "Iron-rich", "Antioxidants"],
+      description: "Beetroot blended with mixed berries for a nutrient boost",
+      purchaseLink: "https://example.com/beet-berry"
+    },
+    {
+      name: "Aloe Vera Refresh",
+      brand: "PureLeaf",
+      health_score: 72,
+      nutrition: {
+        calories: 25,
+        sugar: 3,
+      },
+      benefits: ["Hydrating", "Gut friendly", "Low calorie"],
+      description: "Aloe vera drink with light citrus",
+      purchaseLink: "https://example.com/aloe-refresh"
+    }
   ],
   sweets: [
     {
@@ -88,6 +131,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Antioxidants", "Heart health", "Low sugar"],
       description: "70% dark chocolate from organic cacao"
+      ,
+      purchaseLink: "https://example.com/dark-chocolate-70"
     },
     {
       name: "Date & Nut Energy Balls",
@@ -100,6 +145,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Natural sweetness", "Fiber", "Healthy fats"],
       description: "Dates with almonds and cacao"
+      ,
+      purchaseLink: "https://example.com/date-nut-energy-balls"
     }
   ],
   dairy: [
@@ -114,6 +161,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Lactose-free", "Low calorie", "Vitamin D"],
       description: "Unsweetened almond milk"
+      ,
+      purchaseLink: "https://example.com/almond-milk"
     },
     {
       name: "Oat Milk Yogurt",
@@ -126,6 +175,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Plant-based", "Probiotics", "No artificial additives"],
       description: "Cultured oat milk yogurt"
+      ,
+      purchaseLink: "https://example.com/oat-milk-yogurt"
     }
   ],
   grains: [
@@ -140,6 +191,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Complete protein", "High fiber", "Gluten-free"],
       description: "Organic white quinoa"
+      ,
+      purchaseLink: "https://example.com/quinoa"
     },
     {
       name: "Steel Cut Oats",
@@ -152,6 +205,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Whole grain", "Sustained energy", "Heart healthy"],
       description: "100% whole grain steel cut oats"
+      ,
+      purchaseLink: "https://example.com/steel-cut-oats"
     }
   ],
   proteins: [
@@ -166,6 +221,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Omega-3", "High protein", "Vitamin D"],
       description: "Wild-caught Atlantic salmon"
+      ,
+      purchaseLink: "https://example.com/wild-caught-salmon"
     },
     {
       name: "Tempeh",
@@ -178,6 +235,8 @@ export const healthyAlternatives = {
       },
       benefits: ["Plant protein", "Probiotics", "Low fat"],
       description: "Organic fermented soy tempeh"
+      ,
+      purchaseLink: "https://example.com/tempeh"
     }
   ]
 };
