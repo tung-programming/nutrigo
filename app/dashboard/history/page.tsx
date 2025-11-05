@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Card } from "@/components/ui/card"
@@ -213,10 +212,10 @@ export default function HistoryPage() {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="font-bold text-white text-lg">{item.name || 'Unnamed Product'}</h3>
-                      <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-semibold">
-                        {item.category}
-                      </span>
+                        <h3 className="font-bold text-white text-lg">{item.name || 'Unnamed Product'}</h3>
+                        <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-semibold">
+                          {item.category}
+                        </span>
                     </div>
                     {/* Show brand on its own line, but do not use it as the displayed product name */}
                     {item.brand && <p className="text-sm text-slate-400">{item.brand}</p>}
