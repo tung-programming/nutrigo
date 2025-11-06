@@ -1,5 +1,15 @@
 [
   {
+    "id": "scan_1762412243290",
+    "userId": "176991e4-8c57-4085-88e2-c5fbd32f2eaf",
+    "productName": "Chilli Chatka",
+    "brand": "Kurkure",
+    "healthScore": 25,
+    "ingredients": [],
+    "warnings": [],
+    "scannedAt": "2025-11-06T06:57:23.290Z"
+  },
+  {
     "id": "scan_1762350268918",
     "userId": "user_123",
     "productName": "Garden Salad",
