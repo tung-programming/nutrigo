@@ -80,7 +80,7 @@ export default function HistoryPage() {
             id: item.id,
             name: item.productName || item.detected_name || item.name || item.product_name || "Unnamed Product",
             brand: item.brand || "",
-            score: item.healthScore || 0,
+            score: item.health_score || 0,
             category: item.category || "General",
             date: item.scannedAt || new Date().toISOString(),
             calories: item.calories || 0,
