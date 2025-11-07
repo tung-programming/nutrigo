@@ -50,7 +50,7 @@ const team = [
     name: "TUSHAR P",
     role: "Backend Developer",
     skills: "Auth & Cloud",
-    image: "/team/TU.PNG",
+    image: "/team/TU.png",
     color: "from-amber-400 to-orange-500",
   },
   {
