@@ -34,14 +34,14 @@ const team = [
   {
     name: "ARJUN BHAT",
     role: "Frontend Developer",
-    skills: "React & Next.js",
+    skills: "React & TailwindCSS",
     image: "/team/AR.png",
     color: "from-blue-400 to-cyan-500",
   },
   {
     name: "PRANAV RAO K",
     role: "Frontend Developer",
-    skills: "React & TailwindCSS",
+    skills: "React & Next.js",
     image: "/team/PR.png",
     color: "from-purple-400 to-violet-500",
     
@@ -49,14 +49,14 @@ const team = [
   {
     name: "TUSHAR P",
     role: "Backend Developer",
-    skills: "Auth & Cloud",
+    skills: "API & Database Management",
     image: "/team/TU.png",
     color: "from-amber-400 to-orange-500",
   },
   {
     name: "AMOGHA K A",
     role: "Backend Developer",
-    skills: "Node.js & Databases",
+    skills: "Node.js & Authentication",
     image: "/team/AM.jpg",
     color: "from-emerald-400 to-teal-500",
   },
