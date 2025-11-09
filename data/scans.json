@@ -15,8 +15,8 @@
     "productName": "OREO Original Chocolate Sandwich Cookies with Vanilla Flavored Cream",
     "brand": "OREO",
     "healthScore": 30,
-    "ingredients": [],
-    "warnings": [],
+    "ingredients": ["Enriched Flour (Wheat Flour, Niacin, Reduced Iron, Thiamine Mononitrate {Vitamin B1}, Riboflavin {Vitamin B2}, Folic Acid), Sugar, Palm and/or Canola Oil, Cocoa (Processed with Alkali), High Fructose Corn Syrup, Leavening (Baking Soda and/or Calcium Phosphate), Cornstarch, Salt, Soy Lecithin, Vanillin (Artificial Flavor)"],
+    "warnings": ["Wheat", "Soy"," Milk", "Palm Oil"],
     "scannedAt": "2025-11-06T13:29:57.150Z"
   },
   {
