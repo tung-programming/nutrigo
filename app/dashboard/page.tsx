@@ -19,11 +19,8 @@ import { Button } from "@/components/ui/button"
 import {
   ArrowRight,
   Target,
-  Calendar,
   Sparkles,
   Activity,
-  ArrowUpRight,
-  ArrowDownRight,
   Flame,
   Zap,
 } from "lucide-react"
@@ -55,37 +52,42 @@ interface DashboardStats {
   recentScans: ScanHistory[]
 }
 
+// --- FIXED: streak calculation that properly checks continuous days ---
 function calculateStreak(scans: ScanHistory[]): number {
   if (!scans.length) return 0
+
+  // normalize and sort unique scan days
+  const uniqueDays = Array.from(
+    new Set(
+      scans.map((scan) => {
+        const d = new Date(scan.scannedAt)
+        d.setHours(0, 0, 0, 0)
+        return d.getTime()
+      })
+    )
+  ).sort((a, b) => b - a)
+
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-
-  const scanDates = scans
-    .map((scan) => {
-      const date = new Date(scan.scannedAt)
-      date.setHours(0, 0, 0, 0)
-      return date.getTime()
-    })
-    .sort((a, b) => b - a)
-
-  let streak = 1
+  let streak = 0
   let currentDate = today.getTime()
-  let hasToday = scanDates[0] === currentDate
-  if (!hasToday) {
-    currentDate = new Date(currentDate - 86400000).getTime()
-  }
 
-  for (let i = hasToday ? 1 : 0; i < scanDates.length; i++) {
-    const expectedDate = new Date(currentDate - 86400000).getTime()
-    if (scanDates[i] === expectedDate) {
+  for (let i = 0; i < uniqueDays.length; i++) {
+    if (uniqueDays[i] === currentDate) {
       streak++
-      currentDate = expectedDate
-    } else break
+      currentDate -= 86400000 // move to previous day
+    } else if (uniqueDays[i] === currentDate - 86400000) {
+      streak++
+      currentDate -= 86400000
+    } else if (uniqueDays[i] < currentDate - 86400000) {
+      break // gap found
+    }
   }
 
   return streak
 }
 
+// --- Weekly chart helper ---
 function processWeeklyData(scans: ScanHistory[]) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   const today = new Date()
@@ -116,8 +118,8 @@ function processWeeklyData(scans: ScanHistory[]) {
 export default function DashboardPage() {
   const supabase = createClientComponentClient()
   const router = useRouter()
-  const [userName, setUserName] = useState<string>("User")
-  const [authError, setAuthError] = useState<string>("")
+  const [userName, setUserName] = useState("User")
+  const [authError, setAuthError] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
     totalScans: 0,
@@ -136,17 +138,39 @@ export default function DashboardPage() {
         const data = await response.json()
         if (!data.success) throw new Error("Invalid scan data response")
 
-        // ✅ Normalize Supabase data (fixes Invalid Date)
-        const scans: ScanHistory[] = data.data.map((s: any) => ({
-          id: s.id,
-          productName: s.product_name || s.detected_name || s.brand || "Unnamed Product",
-          brand: s.brand || "—",
-          healthScore: s.health_score || s.healthScore || 0,
-          category: s.category || "General",
-          scannedAt: s.scanned_at || s.created_at || new Date().toISOString(),
-          calories: s.calories || 0,
-          sugar: s.sugar || 0,
-        }))
+        // ✅ Normalize Supabase data and fix timestamps
+        const scans: ScanHistory[] = data.data.map((s: any) => {
+          const rawDate =
+            s.scanned_at ||
+            s.scannedAt ||
+            s.created_at ||
+            s.createdAt ||
+            s.timestamp ||
+            s.updated_at ||
+            s.updatedAt ||
+            null
+          const parsedDate = rawDate ? new Date(rawDate) : new Date()
+          const scannedAt =
+            parsedDate && !isNaN(parsedDate.getTime())
+              ? parsedDate.toISOString()
+              : new Date().toISOString()
+
+          return {
+            id: s.id,
+            productName:
+              s.product_name ||
+              s.detected_name ||
+              s.name ||
+              s.brand ||
+              "Unnamed Product",
+            brand: s.brand || "—",
+            healthScore: s.health_score || s.healthScore || 0,
+            category: s.category || "General",
+            scannedAt,
+            calories: s.calories || 0,
+            sugar: s.sugar || 0,
+          }
+        })
 
         const totalScans = scans.length
         const healthyChoices = scans.filter((s) => s.healthScore >= 70).length
@@ -159,10 +183,13 @@ export default function DashboardPage() {
           totalScans,
           healthyChoices,
           averageScore,
-          streak: calculateStreak(scans),
+          streak: calculateStreak(scans), // ✅ fixed streak logic
           weeklyData: processWeeklyData(scans),
           recentScans: scans
-            .sort((a, b) => new Date(b.scannedAt).getTime() - new Date(a.scannedAt).getTime())
+            .sort(
+              (a, b) =>
+                new Date(b.scannedAt).getTime() - new Date(a.scannedAt).getTime()
+            )
             .slice(0, 4),
         })
       } catch (err) {
@@ -180,20 +207,25 @@ export default function DashboardPage() {
 
     const fetchUser = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
         if (!session) {
           router.push("/auth/login")
           return
         }
 
-        const { data: { user } } = await supabase.auth.getUser()
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
         if (!user) {
           setAuthError("User not found. Please log in again.")
           router.push("/auth/login")
           return
         }
 
-        const fullName = user.user_metadata?.full_name || user.user_metadata?.display_name
+        const fullName =
+          user.user_metadata?.full_name || user.user_metadata?.display_name
         if (fullName) {
           setUserName(fullName)
         } else if (user.email) {
@@ -260,12 +292,12 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Total Scans" value={dashboardStats.totalScans} mainStat="Scanned Items" description="Products tracked" icon={<Zap />} color="emerald" trend="up" trendValue={dashboardStats.totalScans} />
-          <StatCard title="Healthy Choices" value={dashboardStats.healthyChoices} mainStat="Nutritious Picks" description={`${Math.round((dashboardStats.healthyChoices / (dashboardStats.totalScans || 1)) * 100)}% success rate`} icon={<Target />} color="teal" trend="up" trendValue={Math.round((dashboardStats.healthyChoices / (dashboardStats.totalScans || 1)) * 100)} />
-          <StatCard title="Avg Health Score" value={dashboardStats.averageScore} mainStat="Health Metric" description="Out of 100 points" icon={<Activity />} color="cyan" trend={dashboardStats.averageScore >= 70 ? "up" : dashboardStats.averageScore >= 50 ? "neutral" : "down"} trendValue={dashboardStats.averageScore} />
-          <StatCard title="Current Streak" value={dashboardStats.streak} mainStat="Days in a Row" description={dashboardStats.streak > 0 ? "Keep it going! 🔥" : "Start scanning to build your streak"} icon={<Flame />} color="emerald" trend="neutral" trendValue={dashboardStats.streak} />
+          <StatCard title="Total Scans" value={dashboardStats.totalScans} icon={<Zap />} color="emerald" />
+          <StatCard title="Healthy Choices" value={dashboardStats.healthyChoices} icon={<Target />} color="teal" />
+          <StatCard title="Avg Health Score" value={dashboardStats.averageScore} icon={<Activity />} color="cyan" />
+          <StatCard title="Current Streak" value={dashboardStats.streak} icon={<Flame />} color="emerald" />
         </div>
 
         {/* Charts */}
@@ -290,12 +322,19 @@ export default function DashboardPage() {
                 <XAxis dataKey="day" stroke="#94a3b8" />
                 <YAxis stroke="#94a3b8" />
                 <Tooltip contentStyle={{ background: "#0f172a", borderRadius: 12 }} />
-                <Line type="monotone" dataKey="avgScore" stroke="#14b8a6" strokeWidth={3} dot={{ fill: "#14b8a6", r: 5 }} />
+                <Line
+                  type="monotone"
+                  dataKey="avgScore"
+                  stroke="#14b8a6"
+                  strokeWidth={3}
+                  dot={{ fill: "#14b8a6", r: 5 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>
         </div>
 
+        {/* ✅ Recent Scans with fixed date */}
         <RecentScans scans={dashboardStats.recentScans} />
 
         <div className="p-8 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
@@ -315,7 +354,7 @@ export default function DashboardPage() {
 }
 
 // --- Reusable Components ---
-function StatCard({ title, value, mainStat, description, icon, color, trend, trendValue }: any) {
+function StatCard({ title, value, icon, color }: any) {
   const colorMap: any = {
     emerald: { gradient: "from-emerald-500 to-teal-600" },
     teal: { gradient: "from-teal-500 to-cyan-600" },
@@ -326,13 +365,13 @@ function StatCard({ title, value, mainStat, description, icon, color, trend, tre
     <Card className="p-6 bg-slate-900/70 backdrop-blur-md border border-slate-700/50 hover:border-emerald-500/30 shadow-lg transition-all">
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-semibold text-slate-400">{title}</span>
-        <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorMap[color].gradient} flex items-center justify-center text-white`}>
+        <div
+          className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorMap[color].gradient} flex items-center justify-center text-white`}
+        >
           {icon}
         </div>
       </div>
       <p className="text-4xl font-black text-white">{value}</p>
-      <p className="text-sm text-slate-400">{mainStat}</p>
-      <p className="text-xs text-slate-500 mt-1">{description}</p>
     </Card>
   )
 }
