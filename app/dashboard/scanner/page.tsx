@@ -40,12 +40,20 @@ export default function ScannerPage() {
   const SCAN_API_URL = "/api/scan/image"
   const HISTORY_API_URL = "/api/scans"
 
+  // ✅ Reset scanner state whenever you open this page
   useEffect(() => {
-    const scanData = localStorage.getItem("lastScan")
-    if (scanData) setScanResult(JSON.parse(scanData))
+    try {
+      localStorage.removeItem("lastScan")
+      localStorage.removeItem("scanData")
+      sessionStorage.removeItem("lastScan")
+      setScanResult(null)
+      setScanMode(null)
+    } catch (err) {
+      console.warn("Could not clear old scan data:", err)
+    }
   }, [])
 
-  // 🔑 Helper to get current user ID (Supabase or fallback)
+  // 🔑 Helper to get current user ID
   const getCurrentUserId = async (): Promise<string | null> => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -146,10 +154,7 @@ export default function ScannerPage() {
         const formData = new FormData()
         formData.append("image", blob, "capture.jpg")
 
-        const response = await fetch(SCAN_API_URL, {
-          method: "POST",
-          body: formData,
-        })
+        const response = await fetch(SCAN_API_URL, { method: "POST", body: formData })
         const resText = await response.text()
         if (!response.ok) throw new Error(`Scan failed: ${resText}`)
 
@@ -204,6 +209,10 @@ export default function ScannerPage() {
     stopCamera()
     setScanResult(null)
     setScanMode(null)
+    try {
+      localStorage.removeItem("lastScan")
+      sessionStorage.removeItem("lastScan")
+    } catch {}
   }
 
   if (scanResult) {
@@ -212,7 +221,6 @@ export default function ScannerPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-      {/* Scan Loading Portal */}
       <ScanLoadingPortal
         open={isScanning}
         message="Analyzing label..."
@@ -230,7 +238,6 @@ export default function ScannerPage() {
       </div>
 
       <div className="p-4 md:p-8 lg:p-12 space-y-8 relative z-10">
-        {/* Header */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center shadow-xl shadow-emerald-500/25">
@@ -248,7 +255,6 @@ export default function ScannerPage() {
         {/* Main Options */}
         {!scanMode ? (
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Camera Option */}
             <Card className="group relative p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 shadow-xl cursor-pointer overflow-hidden">
               <button
                 onClick={handleCameraStart}
@@ -262,7 +268,6 @@ export default function ScannerPage() {
               </button>
             </Card>
 
-            {/* Upload Option */}
             <Card className="group relative p-8 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300 shadow-xl cursor-pointer overflow-hidden">
               <button
                 onClick={() => fileInputRef.current?.click()}
