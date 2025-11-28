@@ -1,0 +1,462 @@
+[
+  {
+    "question": "What is NutriGo?",
+    "answer": "NutriGo is a food scanner and health scoring app that helps you make informed decisions about the food you eat. You can scan barcodes or take photos of food products to get instant nutritional information, health scores, ingredient analysis, and personalized warnings."
+  },
+  {
+    "question": "How do I scan a food product?",
+    "answer": "You can scan products in two ways: 1) Use the barcode scanner feature to scan the product's barcode for instant results, or 2) Take a photo of the product packaging and our AI will analyze it to detect the product name, brand, and nutritional information."
+  },
+  {
+    "question": "What is a health score?",
+    "answer": "The health score is a rating from 0 to 100 that indicates the overall nutritional quality of a food product. Higher scores (70-100) represent healthier choices with good nutritional value, while lower scores (0-49) indicate products with less nutritional benefit or potentially harmful ingredients."
+  },
+  {
+    "question": "How is the health score calculated?",
+    "answer": "The health score is calculated using AI analysis based on multiple factors including nutritional content (calories, proteins, fats, carbs, fiber), presence of additives and preservatives, sugar and salt levels, artificial ingredients, and overall ingredient quality. The algorithm follows dietary guidelines to provide an accurate health assessment."
+  },
+  {
+    "question": "What nutritional information does NutriGo show?",
+    "answer": "NutriGo displays comprehensive nutritional information including calories, proteins, carbohydrates, fats, fiber, sugar content, salt/sodium levels, vitamins, minerals, and serving size details. You can view both per-serving and per-100g nutritional values."
+  },
+  {
+    "question": "What are the warnings feature?",
+    "answer": "The warnings feature alerts you to potential health concerns in a product such as high sugar content, excessive sodium, harmful additives, artificial preservatives, allergens, trans fats, or ultra-processed ingredients. These warnings help you make healthier food choices based on your dietary needs."
+  },
+  {
+    "question": "Can NutriGo detect allergens?",
+    "answer": "Yes, NutriGo can identify common allergens in food products including gluten, eggs, fish, shellfish, peanuts, tree nuts, soy, milk and lactose, and other allergens listed in the ingredients. This helps you avoid foods that may cause allergic reactions."
+  },
+  {
+    "question": "Does NutriGo work without internet?",
+    "answer": "The barcode scanning feature requires internet connection to access our product database. However, once you've scanned products, your scan history is saved locally and can be accessed offline. We recommend using the app with internet for the best experience."
+  },
+  {
+    "question": "How do I create an account?",
+    "answer": "You can create a NutriGo account using your email address or sign in with your Google account for quick access. Creating an account allows you to save your scan history, track your nutrition over time, and access your data across multiple devices."
+  },
+  {
+    "question": "Is my scan history saved?",
+    "answer": "Yes, all your scanned products are automatically saved to your scan history. You can view your complete scanning history, including the date and time of each scan, product details, health scores, and nutritional information. This helps you track your eating habits over time."
+  },
+  {
+    "question": "Hi",
+    "answer": "Hello! I'm your NutriGo AI assistant. I'm here to help you make healthier food choices! You can ask me about nutrition, food scanning, product information, or how to use NutriGo. How can I assist you today?"
+  },
+  {
+    "question": "Hello",
+    "answer": "Hi there! Welcome to NutriGo! I'm your friendly AI nutrition assistant, ready to help you understand food better and make healthier choices. What would you like to know?"
+  },
+  {
+    "question": "Hey",
+    "answer": "Hey! Great to see you! I'm here to help with all your NutriGo and nutrition questions. Whether you want to scan a product, understand nutrition labels, or learn about healthy eating, I've got you covered. What's on your mind?"
+  },
+  {
+    "question": "How are you?",
+    "answer": "I'm doing great, thank you for asking! I'm here and ready to help you with any questions about NutriGo, nutrition, healthy eating, or food products. What would you like to know?"
+  },
+  {
+    "question": "How are you doing?",
+    "answer": "I'm doing wonderful, thanks! Excited to help you make healthier food choices today. Whether you need help scanning products or understanding nutrition, I'm here for you. What can I help with?"
+  },
+  {
+    "question": "Good morning",
+    "answer": "Good morning! I hope you're having a wonderful day! Ready to make some healthy food choices today? I'm here to help you scan products, understand nutrition labels, and find healthier alternatives. What can I help you with?"
+  },
+  {
+    "question": "Good afternoon",
+    "answer": "Good afternoon! Hope your day is going well! Planning a healthy lunch or snack? I'm here to help you scan products and make informed food choices. How can I assist you?"
+  },
+  {
+    "question": "Good evening",
+    "answer": "Good evening! I hope your day has been great! Whether you're planning dinner or checking your pantry, I'm here to help you make informed food choices. What would you like to know about NutriGo or nutrition?"
+  },
+  {
+    "question": "Good night",
+    "answer": "Good night! Sleep well and remember that healthy eating starts fresh tomorrow! I'll be here whenever you need guidance on nutrition or food scanning. Sweet dreams!"
+  },
+  {
+    "question": "Thank you",
+    "answer": "You're very welcome! I'm happy to help. If you have any more questions about NutriGo, nutrition, or healthy eating, feel free to ask anytime. Stay healthy!"
+  },
+  {
+    "question": "Thanks",
+    "answer": "My pleasure! Always here to help you make healthier food choices. Don't hesitate to reach out if you need anything else!"
+  },
+  {
+    "question": "Thanks a lot",
+    "answer": "You're so welcome! I'm thrilled I could help. Remember, I'm always here whenever you have questions about food, nutrition, or NutriGo features. Take care!"
+  },
+  {
+    "question": "Bye",
+    "answer": "Goodbye! Take care and remember to make healthy food choices. I'll be here whenever you need help with NutriGo. Have a great day!"
+  },
+  {
+    "question": "Goodbye",
+    "answer": "Goodbye! It was great chatting with you. Keep making those healthy choices and scan away! I'll be here whenever you need me. Stay well!"
+  },
+  {
+    "question": "See you",
+    "answer": "See you later! Keep scanning and eating healthy. I'll be here ready to help you anytime. Take care!"
+  },
+  {
+    "question": "What can you do?",
+    "answer": "I can help you with everything related to NutriGo and healthy eating! I can explain how to scan products, interpret health scores, understand nutritional information, identify allergens, explain food additives, guide you through the app features, answer nutrition questions, and help you make healthier food choices. What would you like to know?"
+  },
+  {
+    "question": "Who are you?",
+    "answer": "I'm the NutriGo AI assistant, your personal guide to making healthier food choices! I'm powered by advanced AI to help you understand food products, nutrition labels, and make informed decisions about what you eat. Think of me as your friendly nutrition companion available 24/7!"
+  },
+  {
+    "question": "Tell me about yourself",
+    "answer": "I'm NutriGo's AI assistant, designed to help you navigate the world of nutrition and healthy eating. I'm here to answer your questions about NutriGo's features, explain nutritional information, help you understand food labels, and guide you toward healthier choices. I'm powered by Google's Gemini AI and I'm constantly learning to serve you better!"
+  },
+  {
+    "question": "What's your name?",
+    "answer": "I'm the NutriGo AI Assistant! You can think of me as your personal nutrition helper. I'm here to make your healthy eating journey easier and more informative. What would you like to know?"
+  },
+  {
+    "question": "Help me",
+    "answer": "Of course, I'm here to help! You can ask me about: scanning products with NutriGo, understanding health scores and nutrition labels, identifying allergens and additives, managing dietary restrictions, interpreting warnings, tracking your scan history, or general nutrition questions. What do you need help with?"
+  },
+  {
+    "question": "I need help",
+    "answer": "I'm right here to help you! Whether it's about using NutriGo features, understanding nutrition information, making healthier choices, or anything food-related, just ask. What specifically do you need assistance with?"
+  },
+  {
+    "question": "I don't understand",
+    "answer": "No worries! Let me explain it more simply. What specifically would you like me to clarify? I can break down any topic about NutriGo, nutrition, or healthy eating into easier-to-understand terms. Just let me know what's confusing!"
+  },
+  {
+    "question": "Can you help me?",
+    "answer": "Absolutely! I'm here specifically to help you with NutriGo and all things nutrition. Whether you have questions about scanning products, understanding health scores, dietary advice, or app features, I'm ready to assist. What do you need?"
+  },
+  {
+    "question": "Is this free?",
+    "answer": "Yes! NutriGo is currently free to use with all core features including barcode scanning, photo analysis, health scores, nutritional information, ingredient analysis, allergen detection, and scan history. We believe everyone deserves access to healthy food information!"
+  },
+  {
+    "question": "How much does it cost?",
+    "answer": "NutriGo is completely free! All features including product scanning, health scoring, nutritional analysis, allergen detection, warnings, and scan history are available at no cost. Our mission is to make healthy eating accessible to everyone!"
+  },
+  {
+    "question": "Do I need to pay?",
+    "answer": "No payment required! NutriGo is 100% free to use. All features are available without any subscription or payment. Just create an account and start scanning products to make healthier choices!"
+  },
+  {
+    "question": "How does it work?",
+    "answer": "NutriGo works in three simple steps: 1) Scan a barcode or take a photo of any packaged food product, 2) Our AI powered by Google Gemini instantly analyzes the product and extracts nutritional data, 3) You get an easy-to-understand health score, complete nutritional breakdown, warnings about harmful ingredients, and allergen information. It's that simple!"
+  },
+  {
+    "question": "Is it accurate?",
+    "answer": "Yes! NutriGo uses official product databases, verified manufacturer data, and AI-powered image recognition technology to provide highly accurate nutritional information. Our data is cross-referenced with USDA dietary guidelines and manufacturer specifications. However, for critical dietary decisions, we always recommend verifying with the actual product packaging."
+  },
+  {
+    "question": "Can I trust this?",
+    "answer": "Absolutely! NutriGo uses verified data from official product databases, manufacturer information, and AI-powered analysis by Google Gemini. Our health scoring follows established dietary guidelines from organizations like the USDA and WHO. We're transparent about our methods and continuously update our database. Your privacy is protected, and we never share your data."
+  },
+  {
+    "question": "What makes NutriGo different?",
+    "answer": "NutriGo stands out because we combine powerful AI analysis with user-friendly design! We offer instant barcode and photo scanning, comprehensive health scoring from 0-100, detailed warnings about harmful ingredients, allergen detection, easy-to-understand nutritional breakdowns, and complete scan history tracking. Plus, we focus on empowering you to make informed choices, not just counting calories."
+  },
+  {
+    "question": "Why should I use NutriGo?",
+    "answer": "NutriGo empowers you to make healthier food choices instantly! Instead of deciphering confusing nutrition labels, you get clear health scores, warnings about harmful ingredients, allergen alerts, and comprehensive nutritional information in seconds. It's like having a nutrition expert in your pocket while grocery shopping!"
+  },
+  {
+    "question": "What should I eat?",
+    "answer": "Focus on whole, minimally processed foods! Include plenty of vegetables, fruits, whole grains, lean proteins, healthy fats, and legumes. Use NutriGo to scan packaged foods and choose products with health scores above 70, minimal warnings, lower sugar and sodium, and simple ingredient lists. Balance is key!"
+  },
+  {
+    "question": "What should I eat for breakfast?",
+    "answer": "For a healthy breakfast, look for options rich in protein, fiber, and healthy fats. Great choices include oatmeal with fruits and nuts, whole grain toast with eggs, Greek yogurt with berries, smoothies with vegetables and protein, or whole grain cereals with low sugar content. When shopping, use NutriGo to scan breakfast products and choose ones with health scores above 70!"
+  },
+  {
+    "question": "What should I eat for lunch?",
+    "answer": "A healthy lunch should include lean protein, vegetables, whole grains, and healthy fats. Try grilled chicken salads, whole grain sandwiches with vegetables, quinoa bowls, vegetable stir-fries, or hearty soups with legumes. When buying packaged lunch items, scan them with NutriGo to ensure they have good health scores and minimal processing!"
+  },
+  {
+    "question": "What should I eat for dinner?",
+    "answer": "A balanced dinner includes protein (fish, chicken, tofu), complex carbs (brown rice, quinoa, sweet potato), plenty of vegetables, and healthy fats. Focus on home-cooked meals with whole ingredients. If buying prepared dinners, use NutriGo to check health scores, sodium levels, and avoid products with excessive additives!"
+  },
+  {
+    "question": "What are healthy snacks?",
+    "answer": "Healthy snacks include fresh fruits, raw vegetables with hummus, nuts and seeds, Greek yogurt, whole grain crackers, protein bars with minimal additives, air-popped popcorn, and hard-boiled eggs. When buying packaged snacks, scan them with NutriGo to check the health score, sugar content, and additives before purchasing!"
+  },
+  {
+    "question": "Can you recommend healthy foods?",
+    "answer": "While I can't browse supermarket shelves for you, I can help you identify healthier options when you scan products! Look for items with health scores above 70, minimal warnings, lower sugar and sodium, higher fiber and protein, short ingredient lists, and minimal additives. Scan multiple similar products and compare their scores to find the healthiest choice!"
+  },
+  {
+    "question": "How do I lose weight?",
+    "answer": "Weight loss involves creating a calorie deficit through balanced nutrition and physical activity. NutriGo can help by allowing you to scan products and choose lower-calorie, nutrient-dense options with higher health scores. Focus on whole foods, avoid ultra-processed items, limit added sugars, increase protein and fiber intake, and track your food choices using NutriGo's scan history feature. Always consult a healthcare professional for personalized advice."
+  },
+  {
+    "question": "How can I gain weight?",
+    "answer": "To gain weight healthily, focus on nutrient-dense, calorie-rich foods like nuts, nut butters, avocados, whole grains, lean meats, dairy, dried fruits, and healthy oils. Eat more frequently and choose larger portions. Use NutriGo to scan foods and find options with good nutritional profiles and higher calories. Combine with strength training and consult a healthcare professional for guidance."
+  },
+  {
+    "question": "How do I build muscle?",
+    "answer": "Building muscle requires adequate protein intake (1.6-2.2g per kg of body weight), strength training, and sufficient calories. Focus on lean proteins like chicken, fish, eggs, legumes, and protein supplements. Use NutriGo to scan protein products and choose ones with high protein content, minimal additives, and good health scores. Don't forget carbs for energy and recovery!"
+  },
+  {
+    "question": "What is sugar content?",
+    "answer": "Sugar content refers to the amount of sugar in a food product, including both natural and added sugars. NutriGo displays this information clearly and warns you when products have high sugar levels. The WHO recommends limiting added sugars to less than 10% of your daily calorie intake. High sugar consumption is linked to weight gain, diabetes, and heart disease."
+  },
+  {
+    "question": "How much sugar is too much?",
+    "answer": "The WHO recommends limiting added sugars to less than 10% of your daily calorie intake - that's about 50 grams (12 teaspoons) for a 2,000-calorie diet. Ideally, aim for less than 25 grams (6 teaspoons) daily. NutriGo warns you when products have high sugar content, helping you stay within healthy limits!"
+  },
+  {
+    "question": "What are preservatives?",
+    "answer": "Preservatives are substances added to food to prevent spoilage and extend shelf life. While some are natural (like salt and vinegar), many are synthetic chemicals. NutriGo identifies preservatives in products and warns you about potentially harmful ones like nitrates, BHA, BHT, and sulfites, which may cause health concerns for some individuals."
+  },
+  {
+    "question": "Are preservatives bad?",
+    "answer": "Not all preservatives are bad! Natural preservatives like salt, sugar, and vinegar are generally safe. However, some synthetic preservatives like BHA, BHT, nitrites, and sulfites may cause health concerns including allergic reactions, digestive issues, or potential carcinogenic effects. NutriGo identifies these preservatives and includes them in the health score calculation."
+  },
+  {
+    "question": "Are artificial sweeteners bad?",
+    "answer": "Artificial sweeteners like aspartame, sucralose, and saccharin are low-calorie sugar substitutes. While approved by food authorities, research suggests mixed results regarding their long-term health effects. Some studies link them to metabolic issues and gut health disruption. NutriGo identifies artificial sweeteners in products and includes them in the health score calculation, allowing you to make informed choices."
+  },
+  {
+    "question": "What are additives?",
+    "answer": "Food additives are substances added to food for preservation, color, flavor, or texture. They include preservatives, colorings, flavorings, emulsifiers, and sweeteners. While many are safe, some may cause health concerns. NutriGo analyzes all additives in products and warns you about potentially harmful ones, helping you choose cleaner options."
+  },
+  {
+    "question": "What is gluten?",
+    "answer": "Gluten is a protein found in wheat, barley, rye, and related grains. People with celiac disease or gluten sensitivity must avoid gluten-containing foods as it causes immune reactions and digestive problems. NutriGo's allergen detection feature identifies gluten in products, making it easy for you to find safe, gluten-free options when scanning packaged foods."
+  },
+  {
+    "question": "Am I allergic to something?",
+    "answer": "I can't diagnose allergies, but NutriGo can help you identify allergens in food products! Common allergens include gluten, dairy, eggs, nuts, soy, fish, and shellfish. If you suspect an allergy, see a doctor for testing. Once diagnosed, use NutriGo's allergen detection feature to scan products and avoid ingredients that trigger your allergies."
+  },
+  {
+    "question": "I have diabetes, can NutriGo help?",
+    "answer": "Yes! NutriGo can be very helpful for managing diabetes. When you scan products, pay special attention to sugar content, carbohydrate levels, and the health score. Look for products with low sugar, high fiber, and minimal ultra-processed ingredients. The app helps you identify hidden sugars and make better choices to manage blood sugar levels. Always consult your healthcare provider for personalized dietary advice."
+  },
+  {
+    "question": "I have high blood pressure, what should I eat?",
+    "answer": "For high blood pressure, focus on low-sodium foods, plenty of fruits and vegetables, whole grains, lean proteins, and healthy fats (the DASH diet). Use NutriGo to scan products and check sodium content - aim for less than 2,300mg daily, ideally 1,500mg. Avoid processed foods, which are typically high in sodium. Always follow your doctor's dietary recommendations."
+  },
+  {
+    "question": "I have celiac disease, is NutriGo useful?",
+    "answer": "Absolutely! NutriGo's allergen detection feature specifically identifies gluten in products, making it invaluable for managing celiac disease. Scan every packaged product to check for gluten-containing ingredients like wheat, barley, rye, and cross-contamination warnings. This helps you safely navigate grocery shopping and avoid accidental gluten exposure."
+  },
+  {
+    "question": "What are macros?",
+    "answer": "Macros (macronutrients) are the three main nutrients your body needs in large amounts: proteins for muscle building and repair, carbohydrates for energy, and fats for hormone production and nutrient absorption. NutriGo displays the macro breakdown for every scanned product, helping you understand and balance your nutritional intake."
+  },
+  {
+    "question": "What is protein?",
+    "answer": "Protein is an essential macronutrient made of amino acids, crucial for building and repairing tissues, muscles, hormones, and enzymes. Adults need about 0.8-1g of protein per kg of body weight daily (more if active). Good sources include meat, fish, eggs, dairy, legumes, nuts, and tofu. NutriGo shows protein content in all scanned products."
+  },
+  {
+    "question": "How much protein do I need?",
+    "answer": "Protein needs vary: sedentary adults need 0.8g per kg of body weight daily; active individuals need 1.2-1.6g per kg; athletes and bodybuilders need 1.6-2.2g per kg. For a 70kg person, that's 56-154g daily depending on activity level. Use NutriGo to scan protein-rich products and track your intake through your scan history!"
+  },
+  {
+    "question": "What are carbs?",
+    "answer": "Carbohydrates are your body's main energy source, broken down into glucose for fuel. They include sugars, starches, and fiber. Complex carbs (whole grains, vegetables, legumes) are healthier than simple carbs (white bread, candy). NutriGo shows total carbs, sugar, and fiber content, helping you choose better carb sources."
+  },
+  {
+    "question": "Should I avoid carbs?",
+    "answer": "Not all carbs are bad! Complex carbohydrates from whole grains, vegetables, fruits, and legumes provide essential energy, fiber, and nutrients. It's refined and processed carbs (white bread, sugary snacks) you should limit. NutriGo helps you distinguish between healthy and unhealthy carb sources by analyzing ingredients and providing health scores."
+  },
+  {
+    "question": "What are good fats?",
+    "answer": "Good fats are unsaturated fats found in avocados, nuts, seeds, olive oil, fatty fish, and nut butters. They support heart health, brain function, and hormone production. Limit saturated fats (red meat, butter) and avoid trans fats completely. NutriGo shows fat breakdown and warns about unhealthy fats in products."
+  },
+  {
+    "question": "What is fiber?",
+    "answer": "Fiber is a type of carbohydrate that your body can't digest. It's essential for digestive health, helps control blood sugar, lowers cholesterol, and promotes feelings of fullness. NutriGo shows fiber content in products. Look for high-fiber foods like whole grains, vegetables, fruits, legumes, and nuts. Adults should aim for 25-30 grams of fiber daily."
+  },
+  {
+    "question": "What are trans fats?",
+    "answer": "Trans fats are unhealthy fats created through hydrogenation of oils. They increase bad cholesterol (LDL), decrease good cholesterol (HDL), and significantly raise heart disease risk. NutriGo warns you when products contain trans fats or partially hydrogenated oils. Avoid these completely - look for products with 0g trans fats and no partially hydrogenated oils in ingredients."
+  },
+  {
+    "question": "What is cholesterol?",
+    "answer": "Cholesterol is a waxy substance your body needs for cell membranes and hormones. LDL (bad) cholesterol can build up in arteries causing heart disease, while HDL (good) cholesterol removes excess cholesterol. Limit dietary cholesterol from animal products and focus on fiber-rich foods to manage cholesterol levels. NutriGo shows nutritional content to help you make heart-healthy choices."
+  },
+  {
+    "question": "What is sodium?",
+    "answer": "Sodium is a mineral essential for fluid balance and nerve function, but most people consume too much through salt in processed foods. High sodium intake is linked to high blood pressure and heart disease. NutriGo displays sodium content and warns when levels are high. Limit sodium to less than 2,300mg daily (about 1 teaspoon of salt)."
+  },
+  {
+    "question": "How much water should I drink?",
+    "answer": "General recommendations suggest 8-10 cups (2-2.5 liters) of water daily, but needs vary based on activity level, climate, and body size. A good rule: drink when thirsty and check that your urine is light yellow. While I focus on food nutrition, staying hydrated is crucial for overall health!"
+  },
+  {
+    "question": "What are vitamins?",
+    "answer": "Vitamins are essential micronutrients your body needs in small amounts for various functions like immunity, bone health, and energy production. Key vitamins include A, C, D, E, K, and B-complex. Get them from a varied diet of fruits, vegetables, whole grains, proteins, and dairy. NutriGo shows when products are fortified with vitamins."
+  },
+  {
+    "question": "What are minerals?",
+    "answer": "Minerals are essential nutrients including calcium for bones, iron for blood, potassium for heart health, magnesium for muscles, and zinc for immunity. Get them through a balanced diet of vegetables, fruits, whole grains, proteins, and dairy. NutriGo displays mineral content when scanning fortified products."
+  },
+  {
+    "question": "What are calories?",
+    "answer": "Calories measure the energy your body gets from food. You need calories for basic functions, physical activity, and digestion. Average adults need 1,800-2,500 calories daily, varying by age, gender, size, and activity level. NutriGo shows calorie content per serving, helping you track energy intake and make informed choices."
+  },
+  {
+    "question": "How many calories should I eat?",
+    "answer": "Calorie needs vary: sedentary women need about 1,800-2,000 calories daily; sedentary men need 2,200-2,400; active individuals need 2,000-2,800+. It depends on age, gender, size, and activity level. Use NutriGo to scan foods and be mindful of portions. For personalized guidance, consult a nutritionist or use a TDEE calculator."
+  },
+  {
+    "question": "Can I eat on a budget and still be healthy?",
+    "answer": "Absolutely! Healthy eating on a budget is possible. Focus on whole foods like beans, lentils, eggs, seasonal vegetables, whole grains, frozen produce (just as nutritious!), and store brands. Use NutriGo to scan budget-friendly packaged items and compare prices versus health scores to find the best value for nutritious options. Cooking at home and meal planning also help save money while eating healthy."
+  },
+  {
+    "question": "What is organic food?",
+    "answer": "Organic food is grown without synthetic pesticides, fertilizers, GMOs, antibiotics, or growth hormones. While organic doesn't automatically mean healthier or more nutritious, it reduces chemical exposure and supports sustainable farming. NutriGo focuses on nutritional content and ingredient quality rather than organic certification, helping you evaluate any product's health value."
+  },
+  {
+    "question": "Is organic better?",
+    "answer": "Organic can be better for reducing pesticide exposure and supporting sustainable farming, but it's not always more nutritious. What matters most is eating plenty of fruits and vegetables, whether organic or conventional. Use NutriGo to evaluate nutritional quality regardless of organic status - a conventional apple is healthier than organic cookies!"
+  },
+  {
+    "question": "What are empty calories?",
+    "answer": "Empty calories come from foods high in calories but low in nutrients - typically foods with added sugars, unhealthy fats, and minimal vitamins, minerals, or fiber. Examples include soda, candy, chips, pastries, and alcohol. NutriGo's health scores identify these foods with low ratings and warnings, helping you avoid empty-calorie products."
+  },
+  {
+    "question": "What is processed food?",
+    "answer": "Processed foods are altered from their natural state through canning, freezing, drying, or adding ingredients. Not all processing is bad - frozen vegetables are healthy! Ultra-processed foods with many additives, preservatives, and artificial ingredients are concerning. NutriGo identifies ultra-processed products through ingredient analysis and gives them lower health scores."
+  },
+  {
+    "question": "What is ultra-processed food?",
+    "answer": "Ultra-processed foods contain multiple artificial ingredients, preservatives, additives, high levels of sugar, salt, unhealthy fats, and little nutritional value. Examples include soda, chips, instant noodles, packaged snacks, and sugary cereals. NutriGo identifies these characteristics through ingredient analysis and warns you about ultra-processed products with low health scores."
+  },
+  {
+    "question": "Are protein bars healthy?",
+    "answer": "It depends! Some protein bars are nutritious with quality ingredients, while others are glorified candy bars with excessive sugar and additives. Use NutriGo to scan protein bars and check the health score, protein content, sugar levels, and ingredient list. Look for bars with 10+ grams of protein, less than 10g sugar, minimal additives, and recognizable ingredients."
+  },
+  {
+    "question": "What is clean eating?",
+    "answer": "Clean eating means choosing whole, minimally processed foods and avoiding artificial ingredients, excessive additives, and ultra-processed products. Focus on fruits, vegetables, whole grains, lean proteins, nuts, and legumes. NutriGo supports clean eating by identifying processed ingredients, additives, preservatives, and giving higher health scores to minimally processed foods with simple, recognizable ingredients."
+  },
+  {
+    "question": "What is meal prep?",
+    "answer": "Meal prep involves planning and preparing meals in advance, typically for the week. It saves time, money, and helps maintain healthy eating habits. Batch cook proteins, grains, and vegetables, then portion them into containers. Use NutriGo to scan any packaged ingredients you use, ensuring you're meal prepping with healthy, nutritious foods!"
+  },
+  {
+    "question": "Can kids use NutriGo?",
+    "answer": "Yes! NutriGo is great for teaching kids about nutrition. Parents can scan snacks, drinks, and lunch items to show children how to make healthy choices. It's an educational tool that makes nutrition fun and interactive. The health scores and color-coded warnings make it easy for kids to understand which foods are healthier. Great for building lifelong healthy habits!"
+  },
+  {
+    "question": "Is NutriGo good for pregnancy?",
+    "answer": "Yes! During pregnancy, nutrition is crucial. Use NutriGo to scan foods and avoid products with harmful additives, high mercury (certain fish), unpasteurized items, and excessive sodium. Focus on nutrient-dense foods with good health scores, high in folate, iron, calcium, and protein. Always follow your doctor's specific dietary recommendations during pregnancy."
+  },
+  {
+    "question": "Can elderly people use NutriGo?",
+    "answer": "Absolutely! NutriGo is perfect for seniors managing health conditions like diabetes, hypertension, or heart disease. The easy-to-read health scores and clear warnings help elderly users make appropriate food choices. It's especially helpful for monitoring sodium, sugar, medication interactions, and ensuring adequate protein and nutrient intake for healthy aging."
+  },
+  {
+    "question": "How do I read nutrition labels?",
+    "answer": "Nutrition labels show serving size, calories, macros (protein, carbs, fats), and key nutrients. Start with serving size - all other numbers are based on this. Check calories, then %Daily Values for nutrients (5% or less is low, 20% or more is high). NutriGo simplifies this by scanning labels for you and presenting the information with health scores and warnings."
+  },
+  {
+    "question": "What does serving size mean?",
+    "answer": "Serving size is the standardized amount used for nutritional information on labels. It's not necessarily the amount you should eat - it's for comparison purposes. Always check serving size first, as packages may contain multiple servings. NutriGo displays nutrition per serving and helps you understand if you're consuming more than one serving."
+  },
+  {
+    "question": "What are probiotics?",
+    "answer": "Probiotics are beneficial bacteria that support digestive health, boost immunity, and improve gut microbiome balance. They're found in fermented foods like yogurt, kefir, sauerkraut, kimchi, kombucha, and miso. When scanning dairy products and fermented foods with NutriGo, look for 'live active cultures' or specific probiotic strains in the ingredients for health benefits."
+  },
+  {
+    "question": "What is keto diet?",
+    "answer": "The keto (ketogenic) diet is very low-carb (20-50g daily), moderate protein, and high fat. It puts your body in ketosis, burning fat for energy instead of carbs. Use NutriGo to scan products and choose those very low in carbs and sugar. Check total carbs and subtract fiber to get net carbs. Always consult a healthcare provider before starting keto."
+  },
+  {
+    "question": "What is vegan diet?",
+    "answer": "A vegan diet excludes all animal products: meat, fish, dairy, eggs, and honey. It's plant-based, focusing on fruits, vegetables, grains, legumes, nuts, and seeds. Use NutriGo to scan products for hidden animal ingredients like whey, casein, gelatin, or animal-derived additives. Check the allergen section for dairy and egg alerts."
+  },
+  {
+    "question": "What is vegetarian diet?",
+    "answer": "Vegetarians don't eat meat or fish but may consume dairy and eggs (lacto-ovo vegetarian). Some are lacto-vegetarian (dairy, no eggs) or ovo-vegetarian (eggs, no dairy). Use NutriGo to scan products and check ingredients for hidden meat products like gelatin, animal-based broths, or meat-derived additives."
+  },
+  {
+    "question": "What is paleo diet?",
+    "answer": "The paleo diet focuses on whole foods our ancestors ate: meat, fish, vegetables, fruits, nuts, and seeds, while avoiding grains, legumes, dairy, and processed foods. Use NutriGo to scan products and avoid those with grains, legumes, dairy, refined sugars, or processed ingredients. Look for simple, whole-food ingredients."
+  },
+  {
+    "question": "What is Mediterranean diet?",
+    "answer": "The Mediterranean diet emphasizes vegetables, fruits, whole grains, fish, olive oil, nuts, and moderate wine, with limited red meat and processed foods. It's one of the healthiest eating patterns. Use NutriGo to scan products and choose those with minimal processing, healthy fats, whole grains, and high nutritional value - look for health scores above 70!"
+  },
+  {
+    "question": "I'm confused about nutrition",
+    "answer": "That's completely normal - nutrition can be overwhelming with so much conflicting information! NutriGo makes it simple by doing the analysis for you. Just scan products and focus on three things: 1) Health score (aim for 70+), 2) Warnings (avoid products with multiple red flags), and 3) Key nutrients (protein, fiber, sugar, sodium). Start with these basics and you'll naturally learn more over time!"
+  },
+  {
+    "question": "Why is nutrition important?",
+    "answer": "Nutrition is fundamental to health! Proper nutrition provides energy, supports immune function, maintains healthy weight, builds strong bones and muscles, prevents chronic diseases like diabetes and heart disease, improves mental health, and enhances quality of life. NutriGo helps you make nutritious choices easily by providing instant health information about the foods you eat."
+  },
+  {
+    "question": "How do I start eating healthy?",
+    "answer": "Start small! Begin by scanning your current groceries with NutriGo to understand what you're eating. Then gradually: replace one unhealthy item with a healthier alternative, add one fruit or vegetable daily, drink more water, reduce sugary drinks, choose whole grains over refined, and cook more at home. Use NutriGo to guide better choices when shopping. Progress, not perfection!"
+  },
+  {
+    "question": "I want to be healthier",
+    "answer": "That's a great goal! Start by using NutriGo to scan everything you eat and identify areas for improvement. Focus on: eating more whole foods, reducing ultra-processed items, increasing vegetables and fruits, staying hydrated, getting adequate sleep, being physically active, and managing stress. Small consistent changes lead to lasting results. NutriGo makes the nutrition part easy!"
+  },
+  {
+    "question": "What's wrong with my diet?",
+    "answer": "I can't assess your specific diet, but NutriGo can help you identify issues! Scan your typical foods and look for patterns: Are most products scoring below 50? Do you see frequent high sugar or sodium warnings? Are there many ultra-processed items? Use your scan history to spot trends. Aim to gradually replace low-scoring items with healthier alternatives scoring 70+."
+  },
+  {
+    "question": "Can you create a meal plan?",
+    "answer": "While I can't create personalized meal plans, I can guide you! A healthy day includes: breakfast with protein and fiber, balanced lunch with vegetables and whole grains, nutritious dinner with lean protein, and healthy snacks. Use NutriGo to scan all ingredients and packaged foods, choosing items with good health scores. For customized meal plans, consult a registered dietitian."
+  },
+  {
+    "question": "Do I need supplements?",
+    "answer": "Most people can get necessary nutrients from a balanced diet, but some may need supplements (vitamin D, B12 for vegans, iron for some women, calcium for those avoiding dairy). Use NutriGo to ensure you're eating nutrient-rich foods. If you're considering supplements, consult a healthcare provider or dietitian for personalized recommendations based on your specific needs and deficiencies."
+  },
+  {
+    "question": "What is BMI?",
+    "answer": "BMI (Body Mass Index) is a measure of body fat based on height and weight. It's calculated as weight(kg) ÷ height(m)². Categories: underweight (<18.5), normal (18.5-24.9), overweight (25-29.9), obese (30+). While useful for populations, BMI doesn't account for muscle mass or body composition. Focus on overall health, not just numbers. NutriGo helps by guiding healthier food choices!"
+  },
+  {
+    "question": "How do I boost my energy?",
+    "answer": "Boost energy through nutrition by: eating regular balanced meals, choosing complex carbs over simple sugars, including protein with every meal, staying hydrated, getting adequate B vitamins and iron, limiting caffeine dependency, and avoiding ultra-processed foods that cause energy crashes. Use NutriGo to scan foods and choose energizing, nutrient-dense options with good health scores!"
+  },
+  {
+    "question": "Why am I always hungry?",
+    "answer": "Constant hunger can result from: not enough protein or fiber, eating too many refined carbs that spike blood sugar, dehydration (thirst feels like hunger), inadequate sleep, stress, or too few calories. Use NutriGo to choose filling foods high in protein and fiber, avoid high-sugar items that cause crashes, and focus on whole foods. If it persists, consult a doctor."
+  },
+  {
+    "question": "How do I stop sugar cravings?",
+    "answer": "Reduce sugar cravings by: eating regular protein-rich meals, staying hydrated, getting adequate sleep, managing stress, gradually reducing sugar intake (cold turkey can backfire), eating fruit for natural sweetness, and avoiding artificial sweeteners that maintain sweet cravings. Use NutriGo to identify and avoid high-sugar products, choosing healthier alternatives with scores above 70."
+  },
+  {
+    "question": "Is it safe?",
+    "answer": "Yes, NutriGo is completely safe! We use secure authentication, encrypted data storage with Supabase, and never share your personal information with third parties. Your scan history is private and you can delete it anytime. Our AI analysis uses official verified databases and follows established dietary guidelines. Your data security and privacy are our top priorities!"
+  },
+  {
+    "question": "Who made NutriGo?",
+    "answer": "NutriGo is developed by a dedicated team passionate about making nutrition accessible and understandable for everyone. We combine advanced AI technology powered by Google Gemini with nutrition science to help people make healthier food choices. Our mission is to empower you with instant, accurate nutritional information at your fingertips!"
+  },
+  {
+    "question": "How can I contact support?",
+    "answer": "For support, feedback, or questions, you can reach our team through the Contact section in the app or website. We're here to help with any issues, questions, or suggestions you have. We value your feedback and continuously improve NutriGo based on user input. Don't hesitate to reach out - we're committed to your success!"
+  },
+  {
+    "question": "Can I suggest new features?",
+    "answer": "Absolutely! We love hearing from users. Your feedback helps us improve NutriGo and add features that matter most to you. Please share your feature suggestions, improvement ideas, or any feedback through our Contact page. We review all suggestions and prioritize based on user needs. Your input shapes the future of NutriGo!"
+  },
+  {
+    "question": "You're amazing",
+    "answer": "Thank you so much! That really means a lot! I'm here to help you make healthier choices, and it's wonderful to know I'm being helpful. Keep using NutriGo to stay on your healthy eating journey. If you ever need anything, I'm always here!"
+  },
+  {
+    "question": "You're helpful",
+    "answer": "I'm so glad I could help! That's exactly what I'm here for - making nutrition easier to understand and helping you make better food choices. Feel free to ask me anything anytime. Here to support your healthy lifestyle!"
+  },
+  {
+    "question": "I love this app",
+    "answer": "That's wonderful to hear! We're thrilled you love NutriGo! It makes us so happy to know we're helping you on your healthy eating journey. Keep scanning, keep learning, and keep making great choices. We're here to support you every step of the way!"
+  },
+  {
+    "question": "This is great",
+    "answer": "Thank you! We're passionate about making nutrition simple and accessible. It's fantastic that you're finding value in NutriGo. Keep using it to make informed choices, and don't hesitate to reach out if you ever need help. Here's to your health!"
+  }
+]

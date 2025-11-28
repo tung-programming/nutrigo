@@ -7,24 +7,46 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const scan_routes_1 = __importDefault(require("./routes/scan.routes"));
 const alternatives_routes_1 = __importDefault(require("./routes/alternatives.routes"));
+
 const app = (0, express_1.default)();
+
 // Debug middleware to log all requests
 app.use((req, res, next) => {
     console.log(`📥 ${req.method} ${req.url}`);
     next();
 });
+
 // Enable CORS and JSON parsing
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
+
 // Mount API routes with debug logging
 console.log("📍 Mounting /api/scan routes...");
 app.use("/api/scan", scan_routes_1.default);
+
 console.log("📍 Mounting /api/alternatives routes...");
 app.use("/api/alternatives", alternatives_routes_1.default);
+
+// Load chatbot routes with error handling
+console.log("📍 Attempting to load chatbot routes...");
+try {
+    const chatbotRoutes = require("./routes/chatbot.routes");
+    console.log("✅ Chatbot routes loaded:", typeof chatbotRoutes);
+    app.use("/api/chatbot", chatbotRoutes);
+    console.log("✅ Chatbot routes mounted successfully");
+} catch (error) {
+    console.error("❌ Failed to load chatbot routes:", error.message);
+    console.error("Stack:", error.stack);
+}
+
 // Test route to verify Express is working
 app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", routes: ["/api/scan", "/api/alternatives"] });
+    res.json({ 
+        status: "ok", 
+        routes: ["/api/scan", "/api/alternatives", "/api/chatbot"] 
+    });
 });
+
 // Global error handler
 app.use((error, req, res, next) => {
     console.error("❌ Server error:", error);
@@ -34,4 +56,5 @@ app.use((error, req, res, next) => {
         path: req.path
     });
 });
+
 exports.default = app;

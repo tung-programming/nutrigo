@@ -22,9 +22,19 @@ app.use("/api/scan", scanRoutes);
 console.log("📍 Mounting /api/alternatives routes...");
 app.use("/api/alternatives", alternativesRoutes);
 
+// Load chatbot routes
+console.log("📍 Loading chatbot routes...");
+try {
+  const chatbotRoutes = require("./routes/chatbot.routes");
+  app.use("/api/chatbot", chatbotRoutes);
+  console.log("✅ Chatbot routes mounted successfully");
+} catch (error: any) {
+  console.error("❌ Failed to load chatbot routes:", error.message);
+}
+
 // Test route to verify Express is working
 app.get("/api/health", (req: express.Request, res: express.Response) => {
-  res.json({ status: "ok", routes: ["/api/scan", "/api/alternatives"] });
+  res.json({ status: "ok", routes: ["/api/scan", "/api/alternatives", "/api/chatbot"] });
 });
 
 // Global error handler
