@@ -9,7 +9,7 @@ export default function ChatbotWidget() {
     {
       role: 'assistant',
       content:
-        "Hi! I'm your NutriGo AI assistant. Ask me anything about nutrition, food scanning, or how to use our app! 🥗✨",
+        "Hi! I'm your NutriGo AI assistant. Ask me anything about nutrition, packaged food scanning, or how to use our app! 🥫✨",
     },
   ]);
   const [input, setInput] = useState('');
