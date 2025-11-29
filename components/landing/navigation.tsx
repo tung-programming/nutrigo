@@ -1,14 +1,17 @@
 "use client"
 
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 
+
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,12 +23,14 @@ export default function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+
   const menuItems = [
     { name: "Features", href: "/#features" },
     { name: "About Us", href: "/#about" },
     { name: "Pricing", href: "/pricing" },
     { name: "Contact", href: "/#contact" },
   ]
+
 
   return (
     <nav
@@ -37,8 +42,8 @@ export default function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24 md:h-28">
-          {/* Logo Section - BIG version */}
-          <Link href="/" className="flex items-center gap-3 group">
+          {/* Logo Section - Shifted Left */}
+          <Link href="/" className="flex items-center gap-3 group -ml-28 sm:-ml-32 md:-ml-36">
             <div className="relative w-[220px] h-[70px] sm:w-[260px] sm:h-[80px] md:w-[350px] md:h-[120px]">
               <Image
                 src="/logo.png"
@@ -49,6 +54,7 @@ export default function Navigation() {
               />
             </div>
           </Link>
+
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-10">
@@ -63,6 +69,7 @@ export default function Navigation() {
               </Link>
             ))}
           </div>
+
 
           {/* Desktop Buttons */}
           <div className="hidden lg:flex items-center gap-4">
@@ -82,6 +89,7 @@ export default function Navigation() {
             </Link>
           </div>
 
+
           {/* Mobile Menu Toggle */}
           <button
             className="lg:hidden p-2 text-emerald-400 hover:text-emerald-300 transition-colors"
@@ -91,6 +99,7 @@ export default function Navigation() {
             {isOpen ? <X size={30} /> : <Menu size={30} />}
           </button>
         </div>
+
 
         {/* Mobile Menu */}
         <div
@@ -109,6 +118,7 @@ export default function Navigation() {
                 {item.name}
               </Link>
             ))}
+
 
             <div className="flex flex-col gap-3 pt-4">
               <Link href="/auth/login" onClick={() => setIsOpen(false)}>

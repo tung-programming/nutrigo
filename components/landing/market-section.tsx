@@ -1,12 +1,14 @@
 "use client"
 
+
 import { Heart, Dumbbell, Baby, Users, Sparkles, TrendingUp } from "lucide-react"
+
 
 const audiences = [
   {
     icon: Heart,
     title: "Health Enthusiasts",
-    description: "Track every bite with precision. Perfect for those who count macros, monitor sugar intake, and optimize nutrition for peak wellness.",
+    description: "Track every packaged product with precision. Perfect for those who count macros, monitor sugar intake, and optimize nutrition for peak wellness.",
     stat: "53% Indians",
     statLabel: "proactively manage health",
     color: "from-rose-400 to-pink-500",
@@ -16,7 +18,7 @@ const audiences = [
   {
     icon: Dumbbell,
     title: "Fitness Warriors",
-    description: "Fuel your gains right. Whether bulking or cutting, scan meals to hit your protein targets and track calories with military precision.",
+    description: "Fuel your gains right. Whether bulking or cutting, scan packaged meals to hit your protein targets and track calories with military precision.",
     stat: "88% users",
     statLabel: "are 19-40 years old",
     color: "from-emerald-400 to-teal-500",
@@ -26,7 +28,7 @@ const audiences = [
   {
     icon: Baby,
     title: "Parents & Families",
-    description: "Make smarter choices for your loved ones. Decode ingredient lists, spot hidden allergens, and ensure every family meal is nutritious.",
+    description: "Make smarter choices for your loved ones. Decode packaged food labels, spot hidden allergens, and ensure every family meal is nutritious.",
     stat: "64% consumers",
     statLabel: "prioritize transparency",
     color: "from-amber-400 to-orange-500",
@@ -36,7 +38,7 @@ const audiences = [
   {
     icon: Sparkles,
     title: "Lifestyle Transformers",
-    description: "Managing PCOS, diabetes, or weight goals? Get personalized insights on how every food choice impacts your health journey.",
+    description: "Managing PCOS, diabetes, or weight goals? Get personalized insights on how every packaged food choice impacts your health journey.",
     stat: "101M+ Indians",
     statLabel: "living with diabetes",
     color: "from-purple-400 to-violet-500",
@@ -46,7 +48,7 @@ const audiences = [
   {
     icon: Users,
     title: "Conscious Consumers",
-    description: "Know what you're really eating. Scan products to uncover additives, preservatives, and artificial ingredients in seconds.",
+    description: "Know what you're really eating. Scan packaged products to uncover additives, preservatives, and artificial ingredients in seconds.",
     stat: "84% Indians",
     statLabel: "seek healthier options",
     color: "from-cyan-400 to-blue-500",
@@ -56,7 +58,7 @@ const audiences = [
   {
     icon: TrendingUp,
     title: "Busy Professionals",
-    description: "Quick nutrition checks on-the-go. Scan your office lunch or grocery haul in seconds and make informed choices without slowing down.",
+    description: "Quick nutrition checks on-the-go. Scan your packaged office lunch or grocery haul in seconds and make informed choices without slowing down.",
     stat: "28% adults",
     statLabel: "use food apps weekly",
     color: "from-teal-400 to-emerald-500",
@@ -64,6 +66,7 @@ const audiences = [
     emoji: "💼",
   },
 ]
+
 
 export default function ForWhomSection() {
   return (
@@ -74,8 +77,10 @@ export default function ForWhomSection() {
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: "2s" }}></div>
       </div>
 
+
       {/* Particle Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(52,211,153,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(52,211,153,0.02)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
@@ -85,6 +90,7 @@ export default function ForWhomSection() {
             <span className="text-sm font-semibold text-emerald-400">Built for Everyone Who Cares</span>
           </div>
 
+
           <h2 className="text-5xl md:text-6xl font-black">
             <span className="text-white">Your </span>
             <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
@@ -93,10 +99,12 @@ export default function ForWhomSection() {
             <span className="text-white">, Our Mission</span>
           </h2>
 
+
           <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            Whether you're crushing fitness goals, managing health conditions, or simply choosing better for your family — NutriGo adapts to your unique nutrition needs
+            Whether you're crushing fitness goals, managing health conditions, or simply choosing better packaged foods for your family — NutriGo adapts to your unique nutrition needs
           </p>
         </div>
+
 
         {/* Audience Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -112,12 +120,14 @@ export default function ForWhomSection() {
                   className={`absolute -inset-0.5 bg-gradient-to-r ${audience.color} rounded-3xl blur-lg opacity-0 group-hover:opacity-40 transition-all duration-500`}
                 ></div>
 
+
                 {/* Card */}
                 <div className="relative h-full p-8 rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl hover:border-emerald-500/40 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20">
                   {/* Emoji Background */}
                   <div className="absolute top-6 right-6 text-5xl opacity-10 group-hover:opacity-20 transition-opacity duration-300 group-hover:scale-110 transform">
                     {audience.emoji}
                   </div>
+
 
                   {/* Icon */}
                   <div className="mb-6">
@@ -128,15 +138,18 @@ export default function ForWhomSection() {
                     </div>
                   </div>
 
+
                   {/* Content */}
                   <div className="space-y-4 relative">
                     <h3 className="text-2xl font-bold text-white group-hover:text-emerald-400 transition-colors duration-300">
                       {audience.title}
                     </h3>
 
+
                     <p className="text-slate-400 text-sm leading-relaxed">
                       {audience.description}
                     </p>
+
 
                     {/* Stat Badge */}
                     <div className={`inline-flex flex-col p-3 rounded-xl bg-gradient-to-br ${audience.gradient} border border-emerald-500/20 backdrop-blur-sm`}>
@@ -149,6 +162,7 @@ export default function ForWhomSection() {
                     </div>
                   </div>
 
+
                   {/* Corner Accent */}
                   <div
                     className={`absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl ${audience.gradient} opacity-0 group-hover:opacity-100 rounded-tl-full transition-opacity duration-500`}
@@ -158,6 +172,7 @@ export default function ForWhomSection() {
             )
           })}
         </div>
+
 
         {/* Bottom CTA */}
         <div className="mt-20 text-center space-y-6">
@@ -173,10 +188,12 @@ export default function ForWhomSection() {
               ))}
             </div>
 
+
           </div>
 
+
           <p className="text-slate-400 text-sm max-w-2xl mx-auto">
-            No matter where you are in your health journey, NutriGo gives you the insights to make confident decisions about every bite.
+            No matter where you are in your health journey, NutriGo gives you the insights to make confident decisions about every packaged food you choose.
           </p>
         </div>
       </div>

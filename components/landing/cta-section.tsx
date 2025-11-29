@@ -1,8 +1,10 @@
 "use client"
 
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, Zap } from "lucide-react"
+
 
 export default function CTASection() {
   return (
@@ -15,23 +17,27 @@ export default function CTASection() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse-slow"></div>
       </div>
 
+
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 rounded-3xl blur-2xl opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
 
+
           <div className="relative p-10 md:p-12 rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-2xl overflow-hidden">
-            <div className="absolute top-8 right-8 text-4xl animate-float opacity-20">🥗</div>
+            <div className="absolute top-8 right-8 text-4xl animate-float opacity-20">🧃</div>
             <div className="absolute bottom-8 left-8 text-4xl animate-float opacity-20" style={{ animationDelay: "1s" }}>
               📱
             </div>
+
 
             <div className="relative text-center space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/40 rounded-full">
                 <Sparkles size={16} className="text-emerald-400 animate-pulse" />
                 <span className="text-xs font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                  Join 72,000+ Health-Conscious Users
+                  Join Us On This Mission
                 </span>
               </div>
+
 
               <div className="space-y-3">
                 <h2 className="text-3xl md:text-4xl font-black leading-tight">
@@ -40,12 +46,13 @@ export default function CTASection() {
                     Decode
                   </span>
                   <br />
-                  <span className="text-white">Your Food?</span>
+                  <span className="text-white">Your Packaged Foods?</span>
                 </h2>
                 <p className="text-base md:text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
-                  Transform your nutrition journey with AI-powered scanning. Start making smarter choices today.
+                  Transform your nutrition journey with AI-powered packaged food scanning. Start making smarter choices today.
                 </p>
               </div>
+
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link href="/auth/signup">
@@ -71,6 +78,7 @@ export default function CTASection() {
                 </Link>
               </div>
 
+
               <div className="pt-6 flex flex-wrap justify-center items-center gap-6 text-xs text-slate-400">
                 <div className="flex items-center gap-2">
                   <Zap size={14} className="text-emerald-400" />
@@ -87,10 +95,12 @@ export default function CTASection() {
               </div>
             </div>
 
+
             <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-tl-3xl"></div>
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-cyan-500/20 to-transparent rounded-br-3xl"></div>
           </div>
         </div>
+
 
         <div className="grid md:grid-cols-3 gap-6 mt-10">
           {[

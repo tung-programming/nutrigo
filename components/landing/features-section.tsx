@@ -1,14 +1,16 @@
 "use client"
 
-import { Scan, Target, Leaf, TrendingUp, Zap, Shield, ArrowRight } from "lucide-react"
+
+import { Scan, Target, Leaf, TrendingUp, Zap, MessageCircle, ArrowRight } from "lucide-react"
 import { useState } from "react"
+
 
 const features = [
   {
     icon: Scan,
     title: "AI-Powered Scanner",
     description:
-      "Instantly scan any packaged food with advanced AI to decode sugar levels, calories, and hidden ingredients. Crystal-clear visual insights at your fingertips.",
+      "Instantly scan any packaged food product with advanced AI to decode sugar levels, calories, and hidden ingredients. Crystal-clear visual insights at your fingertips.",
     color: "from-emerald-400 to-teal-500",
     emoji: "🔍",
   },
@@ -16,7 +18,7 @@ const features = [
     icon: Target,
     title: "Smart Health Score",
     description:
-      "Every product gets an intelligent Health Score based on comprehensive analysis of sugar, calories, additives, and nutritional value. Know what's truly healthy.",
+      "Every packaged product gets an intelligent Health Score based on comprehensive analysis of sugar, calories, additives, and nutritional value. Know what's truly healthy.",
     color: "from-teal-400 to-cyan-500",
     emoji: "🎯",
   },
@@ -24,7 +26,7 @@ const features = [
     icon: Leaf,
     title: "Better Alternatives",
     description:
-      "Discover healthier substitutes instantly. Compare products side-by-side and make smarter swaps for your everyday nutrition goals.",
+      "Discover healthier packaged food substitutes instantly. Compare products side-by-side and make smarter swaps for your everyday nutrition goals.",
     color: "from-cyan-400 to-emerald-500",
     emoji: "🌱",
   },
@@ -40,22 +42,24 @@ const features = [
     icon: Zap,
     title: "Instant Analysis",
     description:
-      "Get real-time nutrition breakdown in milliseconds. Our AI processes complex data instantly, giving you immediate actionable insights.",
+      "Get real-time nutrition breakdown of packaged products in milliseconds. Our AI processes complex data instantly, giving you immediate actionable insights.",
     color: "from-teal-500 to-cyan-400",
     emoji: "⚡",
   },
   {
-    icon: Shield,
-    title: "Advanced UI",
+    icon: MessageCircle,
+    title: "Smart AI Chatbot",
     description:
-      "Experience a sleek, intuitive interface designed for effortless navigation. Focus on what matters most—your health.",
+      "Ask questions about nutrition, ingredients, and healthy eating. Get instant AI-powered answers and personalized recommendations 24/7.",
     color: "from-cyan-500 to-emerald-400",
-    emoji: "🛡️",
+    emoji: "🤖",
   },
 ]
 
+
 export default function FeaturesSection() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+
 
   return (
     <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 bg-slate-950 relative overflow-hidden">
@@ -64,6 +68,7 @@ export default function FeaturesSection() {
         <div className="absolute top-0 left-1/3 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
       </div>
+
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center space-y-6 mb-20">
@@ -80,9 +85,10 @@ export default function FeaturesSection() {
           </h2>
           
           <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            From intelligent scanning to smarter nutrition choices — NutriGo transforms how you understand food
+            From intelligent packaged food scanning to smarter nutrition choices — NutriGo transforms how you understand packaged products
           </p>
         </div>
+
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => {
@@ -99,12 +105,14 @@ export default function FeaturesSection() {
                   className={`absolute -inset-0.5 bg-gradient-to-r ${feature.color} rounded-3xl blur-lg opacity-0 group-hover:opacity-30 transition-all duration-500`}
                 ></div>
 
+
                 {/* Card */}
                 <div className="relative h-full p-8 rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl hover:border-emerald-500/40 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20">
                   {/* Emoji Background */}
                   <div className="absolute top-4 right-4 text-6xl opacity-5 group-hover:opacity-10 transition-opacity duration-300">
                     {feature.emoji}
                   </div>
+
 
                   <div className="relative space-y-5">
                     {/* Icon */}
@@ -119,6 +127,7 @@ export default function FeaturesSection() {
                       </div>
                     </div>
 
+
                     {/* Content */}
                     <div className="space-y-3">
                       <h3 className="text-2xl font-bold text-white group-hover:text-emerald-400 transition-colors duration-300">
@@ -129,12 +138,14 @@ export default function FeaturesSection() {
                       </p>
                     </div>
 
+
                     {/* Hover Indicator */}
                     <div className="flex items-center gap-2 text-sm font-semibold text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <span>Learn more</span>
                       <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
+
 
                   {/* Animated Corner Accent */}
                   <div
@@ -146,9 +157,10 @@ export default function FeaturesSection() {
           })}
         </div>
 
+
         {/* Bottom CTA */}
         <div className="mt-20 text-center">
-          <p className="text-slate-400 mb-6">Ready to experience the future of nutrition?</p>
+          <p className="text-slate-400 mb-6">Ready to experience the future of packaged food nutrition?</p>
           <button className="px-8 py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:via-teal-400 hover:to-cyan-400 rounded-2xl font-bold text-white shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105">
             Start Free Trial
           </button>
