@@ -335,22 +335,22 @@ Meet the dedicated team of innovators building the future of food transparency i
 <table>
   <tr>
     <td align="center">
-      <img src="/team/AR.png" width="100px;" alt="Arjun Bhat"/><br />
+      <img src="https://raw.githubusercontent.com/tung-programming/nutrigo/main/public/team/AR.png" width="100px;" alt="Arjun Bhat"/><br />
       <b>Arjun Bhat</b><br />
       Frontend Developer
     </td>
     <td align="center">
-      <img src="/team/PR.jpg" width="100px;" alt="Pranav Rao K"/><br />
+      <img src="https://raw.githubusercontent.com/tung-programming/nutrigo/main/public/team/PR.jpg" width="100px;" alt="Pranav Rao K"/><br />
       <b>Pranav Rao K</b><br />
       Frontend Developer
     </td>
     <td align="center">
-      <img src="/team/TU.png" width="100px;" alt="Tushar P"/><br />
+      <img src="https://raw.githubusercontent.com/tung-programming/nutrigo/main/public/team/TU.png" width="100px;" alt="Tushar P"/><br />
       <b>Tushar P</b><br />
       Backend Developer
     </td>
     <td align="center">
-      <img src="/team/AM.jpg" width="100px;" alt="Amogha K A"/><br />
+      <img src="https://raw.githubusercontent.com/tung-programming/nutrigo/main/public/team/AM.jpg" width="100px;" alt="Amogha K A"/><br />
       <b>Amogha K A</b><br />
       Backend Developer
     </td>
@@ -370,6 +370,10 @@ Contributions are what make the open-source community such an amazing place to l
 5. Open a Pull Request
 
 ---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
